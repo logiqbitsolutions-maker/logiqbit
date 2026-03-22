@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -90,79 +91,6 @@ class IntegrationsSection extends StatelessWidget {
     BoxConstraints constraints,
     bool isMobile,
   ) {
-    if (isMobile) {
-      final nodes = [
-        _IntegrationNode(
-          iconData: Icons.phone_android_rounded,
-          iconColor: Colors.blue,
-          category: "MOBILE",
-          title: "Flutter Engine",
-          delay: 500,
-          isMobileLayout: isMobile,
-        ),
-        _IntegrationNode(
-          iconData: Icons.auto_awesome_rounded,
-          iconColor: AppColors.primaryOrange,
-          category: "SOLUTION",
-          title: "Custom AI",
-          delay: 600,
-          isMobileLayout: isMobile,
-        ),
-        _IntegrationNode(
-          iconData: Icons.local_fire_department_rounded,
-          iconColor: Colors.orangeAccent,
-          category: "DATABASE",
-          title: "Cloud Firestore",
-          delay: 700,
-          isMobileLayout: isMobile,
-        ),
-        _IntegrationNode(
-          iconData: Icons.local_fire_department_rounded,
-          iconColor: Colors.redAccent,
-          category: "BACKEND",
-          title: "Firebase",
-          delay: 800,
-          isMobileLayout: isMobile,
-        ),
-        _IntegrationNode(
-          iconData: Icons.psychology_rounded,
-          iconColor: Colors.tealAccent,
-          category: "INTELLIGENCE",
-          title: "Gemini AI",
-          delay: 900,
-          isMobileLayout: isMobile,
-        ),
-        _IntegrationNode(
-          iconData: Icons.security_rounded,
-          iconColor: Colors.blueAccent,
-          category: "SECURITY",
-          title: "Firebase Auth",
-          delay: 1000,
-          isMobileLayout: isMobile,
-        ),
-        _IntegrationNode(
-          iconData: Icons.cloud_done_rounded,
-          iconColor: Colors.greenAccent,
-          category: "LOGIC",
-          title: "Cloud Functions",
-          delay: 1100,
-          isMobileLayout: isMobile,
-        ),
-      ];
-      return Column(
-        children: [
-          _buildCoreHub(),
-          const SizedBox(height: 60),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            alignment: WrapAlignment.center,
-            children: nodes,
-          ),
-        ],
-      );
-    }
-
     return _AnimatedMapArea(constraints: constraints);
   }
 
@@ -315,9 +243,53 @@ class _AnimatedMapAreaState extends State<_AnimatedMapArea>
       ),
     ];
 
+    // Define shared positioning logic (Truly radial/circular)
+    List<Offset> getNodeCenters(Size size) {
+      final center = Offset(size.width / 2, size.height / 2);
+      
+      // Calculate radius based on available width and nodes size
+      final isVerySmall = size.width < 450;
+      final isSmall = size.width < 800;
+      final nodeW = isVerySmall ? 110.0 : (isSmall ? 140.0 : 200.0);
+      
+      // Radius should ensure nodes stay within bounds
+      // (size.width - nodeW) / 2 is the maximum radius we can have
+      final double radius = math.min(
+        (size.width - nodeW) * 0.48, // slightly inside
+        (size.height - 120) * 0.48 // Leave some vertical margin
+      );
+
+      // Define angles in degrees (0 = Right, 90 = Top, etc.)
+      // Matching the visual feel of the web view
+      const angles = [
+        140.0, // Node 0: Top Left
+        90.0,  // Node 1: Top Center
+        40.0,  // Node 2: Top Right
+        180.0, // Node 3: Mid Left
+        0.0,   // Node 4: Mid Right
+        220.0, // Node 5: Bottom Left
+        320.0, // Node 6: Bottom Right
+      ];
+
+      return angles.map((angle) {
+        final rad = angle * math.pi / 180;
+        return Offset(
+          center.dx + radius * math.cos(rad),
+          center.dy - radius * math.sin(rad),
+        );
+      }).toList();
+    }
+
+    final size = Size(widget.constraints.maxWidth, widget.constraints.maxWidth < 600 ? 500.0 : 600.0);
+    final isSmall = size.width < 800;
+    final centers = getNodeCenters(size);
+    final isVerySmall = size.width < 450;
+    final nodeW = isVerySmall ? 110.0 : (isSmall ? 140.0 : 200.0);
+    final nodeH = isSmall ? 56.0 : 80.0;
+
     return SizedBox(
-      width: double.infinity,
-      height: 600.0,
+      width: size.width,
+      height: size.height,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -328,8 +300,9 @@ class _AnimatedMapAreaState extends State<_AnimatedMapArea>
               builder: (context, child) {
                 return CustomPaint(
                   painter: _NetworkPainter(
-                    isMobile: false,
+                    isMobile: isSmall,
                     sparkProgress: _sparkController.value,
+                    nodeCenters: centers,
                   ),
                 );
               },
@@ -340,27 +313,46 @@ class _AnimatedMapAreaState extends State<_AnimatedMapArea>
           Positioned(child: const IntegrationsSection()._buildCoreHub()),
 
           // Nodes
+          // Node 0
           Positioned(
-            top: 50,
-            left: widget.constraints.maxWidth * 0.15,
+            left: centers[0].dx - nodeW/2,
+            top: centers[0].dy - nodeH/2,
             child: nodes[0],
           ),
-          Positioned(top: 0, child: nodes[1]),
+          // Node 1
           Positioned(
-            top: 50,
-            right: widget.constraints.maxWidth * 0.15,
+            left: centers[1].dx - nodeW/2,
+            top: centers[1].dy - nodeH/2,
+            child: nodes[1],
+          ),
+          // Node 2
+          Positioned(
+            left: centers[2].dx - nodeW/2,
+            top: centers[2].dy - nodeH/2,
             child: nodes[2],
           ),
-          Positioned(left: 0, child: nodes[3]),
-          Positioned(right: 0, child: nodes[4]),
+          // Node 3
           Positioned(
-            bottom: 50,
-            left: widget.constraints.maxWidth * 0.15,
+            left: centers[3].dx - nodeW/2,
+            top: centers[3].dy - nodeH/2,
+            child: nodes[3],
+          ),
+          // Node 4
+          Positioned(
+            left: centers[4].dx - nodeW/2,
+            top: centers[4].dy - nodeH/2,
+            child: nodes[4],
+          ),
+          // Node 5
+          Positioned(
+            left: centers[5].dx - nodeW/2,
+            top: centers[5].dy - nodeH/2,
             child: nodes[5],
           ),
+          // Node 6
           Positioned(
-            bottom: 50,
-            right: widget.constraints.maxWidth * 0.15,
+            left: centers[6].dx - nodeW/2,
+            top: centers[6].dy - nodeH/2,
             child: nodes[6],
           ),
         ],
@@ -376,7 +368,6 @@ class _IntegrationNode extends StatelessWidget {
   final String title;
   final int delay;
   final int bobDelay;
-  final bool isMobileLayout;
 
   const _IntegrationNode({
     required this.iconData,
@@ -385,101 +376,109 @@ class _IntegrationNode extends StatelessWidget {
     required this.title,
     required this.delay,
     this.bobDelay = 0,
-    this.isMobileLayout = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
+    final width = MediaQuery.of(context).size.width;
+    final isVerySmall = width < 450;
+    final isSmall = width < 800;
+
     return Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () =>
-                controller.scrollToSection(controller.contactKey, "Contact Us"),
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              width: isMobileLayout ? double.infinity : 200,
-              padding: EdgeInsets.all(isMobileLayout ? 8 : 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF111113).withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () =>
+            controller.scrollToSection(controller.contactKey, "Contact Us"),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: isVerySmall ? 110 : (isSmall ? 140 : 200),
+          padding: EdgeInsets.all(isVerySmall ? 6 : (isSmall ? 8 : 12)),
+          decoration: BoxDecoration(
+            color: const Color(0xFF111113).withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(isVerySmall ? 8 : 16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: iconColor.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      iconData,
-                      color: iconColor,
-                      size: isMobileLayout ? 18 : 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          category,
-                          style: GoogleFonts.inter(
-                            color: const Color(0xFF888888),
-                            fontSize: isMobileLayout ? 9 : 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                        Text(
-                          title,
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: isMobileLayout ? 12 : 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ],
           ),
-        )
-        .animate()
-        .fadeIn(
-          duration: const Duration(milliseconds: 600),
-          delay: Duration(milliseconds: delay),
-        )
-        .scale(begin: const Offset(0.9, 0.9))
-        .then()
-        .animate(onPlay: (controller) => controller.repeat(reverse: true))
-        .moveY(
-          begin: -5,
-          end: 5,
-          duration: const Duration(seconds: 3),
-          delay: Duration(milliseconds: bobDelay),
-          curve: Curves.easeInOut,
-        );
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(isVerySmall ? 4 : (isSmall ? 6 : 10)),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(isVerySmall ? 6 : 10),
+                ),
+                child: Icon(
+                  iconData,
+                  color: iconColor,
+                  size: isVerySmall ? 14 : (isSmall ? 18 : 24),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      category,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF888888),
+                        fontSize: isVerySmall ? 6 : (isSmall ? 8 : 10),
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: isVerySmall ? 0.5 : 1,
+                      ),
+                    ),
+                    Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: isVerySmall ? 9 : (isSmall ? 11 : 14),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    )
+    .animate()
+    .fadeIn(
+      duration: const Duration(milliseconds: 600),
+      delay: Duration(milliseconds: delay),
+    )
+    .scale(begin: const Offset(0.9, 0.9))
+    .then()
+    .animate(onPlay: (controller) => controller.repeat(reverse: true))
+    .moveY(
+      begin: -5,
+      end: 5,
+      duration: const Duration(seconds: 3),
+      delay: Duration(milliseconds: bobDelay),
+      curve: Curves.easeInOut,
+    );
   }
 }
 
 class _NetworkPainter extends CustomPainter {
   final bool isMobile;
   final double sparkProgress;
+  final List<Offset> nodeCenters;
 
-  _NetworkPainter({required this.isMobile, this.sparkProgress = 0});
+  _NetworkPainter({
+    required this.isMobile,
+    this.sparkProgress = 0,
+    required this.nodeCenters,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -490,10 +489,6 @@ class _NetworkPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
-    canvas.drawCircle(center, 150, circlePaint);
-    canvas.drawCircle(center, 300, circlePaint);
-    canvas.drawCircle(center, 450, circlePaint);
-
     final linePaint = Paint()
       ..color = AppColors.primaryOrange.withValues(alpha: 0.15)
       ..style = PaintingStyle.stroke
@@ -503,40 +498,38 @@ class _NetworkPainter extends CustomPainter {
       ..color = AppColors.primaryOrange
       ..style = PaintingStyle.fill;
 
-    if (!isMobile) {
-      final List<Offset> targets = [
-        Offset(size.width * 0.15 + 100, 50 + 30), // Top Left
-        Offset(size.width / 2, 30), // Top Center
-        Offset(size.width * 0.85 - 100, 50 + 30), // Top Right
-        Offset(100, size.height / 2), // Middle Left
-        Offset(size.width - 100, size.height / 2), // Middle Right
-        Offset(size.width * 0.15 + 100, size.height - 50 - 30), // Bottom Left
-        Offset(size.width * 0.85 - 100, size.height - 50 - 30), // Bottom Right
-      ];
+    final double radius1 = isMobile ? 100 : 150;
+    final double radius2 = isMobile ? 200 : 300;
+    final double radius3 = isMobile ? 300 : 450;
 
-      for (var target in targets) {
-        // Draw base line
-        canvas.drawLine(center, target, linePaint);
+    canvas.drawCircle(center, radius1, circlePaint);
+    canvas.drawCircle(center, radius2, circlePaint);
+    canvas.drawCircle(center, radius3, circlePaint);
 
-        // Draw traveling spark
-        final double progress =
-            (sparkProgress + (targets.indexOf(target) / targets.length)) % 1.0;
-        final Offset sparkPos = Offset.lerp(center, target, progress)!;
+    for (var target in nodeCenters) {
+      // Draw base line
+      canvas.drawLine(center, target, linePaint);
 
-        // Glow effect for spark
-        canvas.drawCircle(
-          sparkPos,
-          4,
-          Paint()
-            ..color = AppColors.primaryOrange.withValues(alpha: 0.3)
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
-        );
-        canvas.drawCircle(sparkPos, 2, sparkPaint);
-      }
+      // Draw traveling spark
+      final int index = nodeCenters.indexOf(target);
+      final double progress =
+          (sparkProgress + (index / nodeCenters.length)) % 1.0;
+      final Offset sparkPos = Offset.lerp(center, target, progress)!;
+
+      // Glow effect for spark
+      canvas.drawCircle(
+        sparkPos,
+        4,
+        Paint()
+          ..color = AppColors.primaryOrange.withValues(alpha: 0.3)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
+      );
+      canvas.drawCircle(sparkPos, 2, sparkPaint);
     }
   }
 
   @override
   bool shouldRepaint(covariant _NetworkPainter oldDelegate) =>
-      oldDelegate.sparkProgress != sparkProgress;
+      oldDelegate.sparkProgress != sparkProgress ||
+      oldDelegate.nodeCenters != nodeCenters;
 }

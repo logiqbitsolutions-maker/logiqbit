@@ -34,9 +34,10 @@ class _PortfolioSectionState extends State<PortfolioSection> {
   }
 
   void _onScroll() {
-    double cardWidthWithSpacing = _lastCardWidth + 24; 
-    int newIndex = ((_scrollController.offset / cardWidthWithSpacing).round() + 1);
-    
+    double cardWidthWithSpacing = _lastCardWidth + 24;
+    int newIndex =
+        ((_scrollController.offset / cardWidthWithSpacing).round() + 1);
+
     // Ensure index is within bounds
     int totalItems = _selectedCategory == 'Apps' ? _apps.length : _games.length;
     newIndex = newIndex.clamp(1, totalItems);
@@ -274,7 +275,7 @@ class _PortfolioSectionState extends State<PortfolioSection> {
                             } else if (constraints.maxWidth > 700) {
                               cardWidth = constraints.maxWidth * 0.8;
                             }
-                            
+
                             // Store for scroll indicator calculation
                             _lastCardWidth = cardWidth;
 
@@ -309,11 +310,15 @@ class _PortfolioSectionState extends State<PortfolioSection> {
                           children: [
                             TextSpan(
                               text: "$_currentIndex ",
-                              style: const TextStyle(color: AppColors.primaryOrange),
+                              style: const TextStyle(
+                                color: AppColors.primaryOrange,
+                              ),
                             ),
                             TextSpan(
                               text: "/ ${currentData.length}",
-                              style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.5),
+                              ),
                             ),
                           ],
                         ),
@@ -454,7 +459,7 @@ class _PortfolioNavButtonState extends State<_PortfolioNavButton> {
                       color: AppColors.primaryOrange.withValues(alpha: 0.2),
                       blurRadius: 15,
                       spreadRadius: -2,
-                    )
+                    ),
                   ]
                 : [],
           ),
@@ -543,7 +548,7 @@ class PortfolioCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(32),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  bool isStacked = constraints.maxWidth < 600;
+                  bool isStacked = constraints.maxWidth < 450;
 
                   if (isStacked) {
                     return Column(
@@ -567,14 +572,14 @@ class PortfolioCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Expanded(
-                          flex: 2,
+                          flex: 5,
                           child: _buildImageSection(
                             context,
                             isStacked: isStacked,
                           ),
                         ),
                         Expanded(
-                          flex: 3,
+                          flex: 7,
                           child: _buildContentSection(
                             context,
                             isMobile: isStacked,
@@ -610,7 +615,7 @@ class PortfolioCard extends StatelessWidget {
           child:
               Container(
                     constraints: BoxConstraints(
-                      maxWidth: isStacked ? 200 : 160,
+                      maxWidth: isStacked ? 240 : 220,
                     ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(32),

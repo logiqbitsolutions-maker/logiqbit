@@ -66,7 +66,8 @@ class HomeView extends GetView<HomeController> {
             bottom: 40,
             child: Obx(() {
               return GestureDetector(
-                onTap: () => controller.scrollToSection(controller.heroKey, "Home"),
+                onTap: () =>
+                    controller.scrollToSection(controller.heroKey, "Home"),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
@@ -74,7 +75,9 @@ class HomeView extends GetView<HomeController> {
                       width: 54,
                       height: 54,
                       child: CustomPaint(
-                        painter: ProgressPainter(controller.scrollProgress.value),
+                        painter: ProgressPainter(
+                          controller.scrollProgress.value,
+                        ),
                       ),
                     ),
                     Container(

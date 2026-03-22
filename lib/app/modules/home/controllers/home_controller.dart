@@ -31,10 +31,11 @@ class HomeController extends GetxController {
       );
     }
   }
-@override
+
+  @override
   void onInit() {
     super.onInit();
-    
+
     // 2. Listener set karya pachi turant ek var calculate karo
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _calculateProgress();
@@ -52,7 +53,7 @@ class HomeController extends GetxController {
     if (scrollController.hasClients) {
       double maxScroll = scrollController.position.maxScrollExtent;
       double currentScroll = scrollController.position.pixels;
-      
+
       // Agar page scroll thai shake tem nathi (maxScroll == 0), to progress 1.0 rakho
       if (maxScroll <= 0) {
         scrollProgress.value = 1.0;
@@ -64,6 +65,7 @@ class HomeController extends GetxController {
       scrollProgress.value = progress.clamp(0.0, 1.0);
     }
   }
+
   @override
   void onClose() {
     scrollController.dispose();

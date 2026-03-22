@@ -13,7 +13,8 @@ class AboutSection extends StatefulWidget {
   State<AboutSection> createState() => _AboutSectionState();
 }
 
-class _AboutSectionState extends State<AboutSection> with TickerProviderStateMixin {
+class _AboutSectionState extends State<AboutSection>
+    with TickerProviderStateMixin {
   late final AnimationController _leftController;
   late final AnimationController _rightController;
   bool _hasAnimated = false;
@@ -38,7 +39,8 @@ class _AboutSectionState extends State<AboutSection> with TickerProviderStateMix
       key: const Key('about_section_visibility_root'),
       onVisibilityChanged: (info) {
         if (!mounted) return;
-        final visible = info.visibleFraction > 0.45; // Significantly higher threshold
+        final visible =
+            info.visibleFraction > 0.45; // Significantly higher threshold
         if (visible && !_hasAnimated) {
           _leftController.forward();
           _rightController.forward();
@@ -99,77 +101,79 @@ class _AboutSectionState extends State<AboutSection> with TickerProviderStateMix
 
   Widget _buildLeftContent(bool isDesktop) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            style: GoogleFonts.inter(
-              fontSize: isDesktop ? 48 : 36,
-              fontWeight: FontWeight.w800,
-              height: 1.1,
-              letterSpacing: -1.0,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                style: GoogleFonts.inter(
+                  fontSize: isDesktop ? 48 : 36,
+                  fontWeight: FontWeight.w800,
+                  height: 1.1,
+                  letterSpacing: -1.0,
+                ),
+                children: [
+                  const TextSpan(
+                    text: "About ",
+                    style: TextStyle(color: AppColors.textWhite),
+                  ),
+                  const TextSpan(
+                    text: "Logiqbit\n",
+                    style: TextStyle(color: AppColors.primaryOrange),
+                  ),
+                  const TextSpan(
+                    text: "Solutions",
+                    style: TextStyle(color: AppColors.textWhite),
+                  ),
+                ],
+              ),
             ),
-            children: [
-              const TextSpan(
-                text: "About ",
-                style: TextStyle(color: AppColors.textWhite),
+            const SizedBox(height: 32),
+            Text(
+              "Founded on the principles of logic and digital bit-level precision, Logiqbit Solutions is a full-service technology partner committed to solving complex business challenges with elegant digital products.",
+              style: GoogleFonts.inter(
+                color: AppColors.textLightGrey,
+                fontSize: isDesktop ? 16 : 14,
+                height: 1.6,
               ),
-              const TextSpan(
-                text: "Logiqbit\n",
-                style: TextStyle(color: AppColors.primaryOrange),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "We bridge the gap between ambitious ideas and technical reality, delivering scalable software that drives growth and operational efficiency for modern enterprises.",
+              style: GoogleFonts.inter(
+                color: AppColors.textLightGrey,
+                fontSize: isDesktop ? 16 : 14,
+                height: 1.6,
               ),
-              const TextSpan(
-                text: "Solutions",
-                style: TextStyle(color: AppColors.textWhite),
+            ),
+            const SizedBox(height: 48),
+            if (isDesktop)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(child: _buildStatItem("50", "APPS DELIVERED", "+")),
+                  _buildDivider(),
+                  Flexible(child: _buildStatItem("1", "USERS REACHED", "K+")),
+                  _buildDivider(),
+                  Flexible(
+                    child: _buildStatItem("96", "CLIENT RETENTION", "%"),
+                  ),
+                  _buildDivider(),
+                  Flexible(child: _buildStatItem("5", "CLIENT RATING", "/5")),
+                ],
+              )
+            else
+              Wrap(
+                spacing: 20,
+                runSpacing: 24,
+                children: [
+                  _buildStatItem("50", "APPS DELIVERED", "+"),
+                  _buildStatItem("1", "USERS REACHED", "K+"),
+                  _buildStatItem("96", "CLIENT RETENTION", "%"),
+                  _buildStatItem("5", "CLIENT RATING", "/5"),
+                ],
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-        Text(
-          "Founded on the principles of logic and digital bit-level precision, Logiqbit Solutions is a full-service technology partner committed to solving complex business challenges with elegant digital products.",
-          style: GoogleFonts.inter(
-            color: AppColors.textLightGrey,
-            fontSize: isDesktop ? 16 : 14,
-            height: 1.6,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          "We bridge the gap between ambitious ideas and technical reality, delivering scalable software that drives growth and operational efficiency for modern enterprises.",
-          style: GoogleFonts.inter(
-            color: AppColors.textLightGrey,
-            fontSize: isDesktop ? 16 : 14,
-            height: 1.6,
-          ),
-        ),
-        const SizedBox(height: 48),
-        if (isDesktop)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(child: _buildStatItem("50", "APPS DELIVERED", "+")),
-              _buildDivider(),
-              Flexible(child: _buildStatItem("1", "USERS REACHED", "K+")),
-              _buildDivider(),
-              Flexible(child: _buildStatItem("96", "CLIENT RETENTION", "%")),
-              _buildDivider(),
-              Flexible(child: _buildStatItem("5", "CLIENT RATING", "/5")),
-            ],
-          )
-        else
-          Wrap(
-            spacing: 20,
-            runSpacing: 24,
-            children: [
-              _buildStatItem("50", "APPS DELIVERED", "+"),
-              _buildStatItem("1", "USERS REACHED", "K+"),
-              _buildStatItem("96", "CLIENT RETENTION", "%"),
-              _buildStatItem("5", "CLIENT RATING", "/5"),
-            ],
-          ),
-      ],
-    )
+          ],
+        )
         .animate(controller: _leftController, autoPlay: false)
         .fadeIn(duration: 2000.ms, curve: Curves.easeOutCubic)
         .slideX(begin: -0.03, end: 0, curve: Curves.easeOutQuart);
@@ -177,24 +181,24 @@ class _AboutSectionState extends State<AboutSection> with TickerProviderStateMix
 
   Widget _buildRightContent(bool isDesktop) {
     return Column(
-      children: [
-        _buildAboutCard(
-          icon: Icons.bolt_rounded,
-          title: "Mission-Driven",
-          description:
-              "Accelerating innovation through reliable tech and strategic execution.",
-          isDesktop: isDesktop,
-        ),
-        const SizedBox(height: 24),
-        _buildAboutCard(
-          icon: Icons.verified_user_outlined,
-          title: "Quality Guaranteed",
-          description:
-              "Rigorous testing and peer reviews for every line of code we ship.",
-          isDesktop: isDesktop,
-        ),
-      ],
-    )
+          children: [
+            _buildAboutCard(
+              icon: Icons.bolt_rounded,
+              title: "Mission-Driven",
+              description:
+                  "Accelerating innovation through reliable tech and strategic execution.",
+              isDesktop: isDesktop,
+            ),
+            const SizedBox(height: 24),
+            _buildAboutCard(
+              icon: Icons.verified_user_outlined,
+              title: "Quality Guaranteed",
+              description:
+                  "Rigorous testing and peer reviews for every line of code we ship.",
+              isDesktop: isDesktop,
+            ),
+          ],
+        )
         .animate(controller: _rightController, autoPlay: false)
         .fadeIn(duration: 2000.ms, curve: Curves.easeOutCubic)
         .slideY(begin: 0.03, end: 0, curve: Curves.easeOutQuart);

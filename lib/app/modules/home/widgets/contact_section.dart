@@ -31,9 +31,9 @@ class _ContactSectionState extends State<ContactSection> {
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _subjectController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all fields")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
       return;
     }
 
@@ -93,18 +93,18 @@ class _ContactSectionState extends State<ContactSection> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                SizedBox(
-                  width: 600,
-                  child: Text(
-                    "Have a vision you'd like to bring to life? We're here to help you navigate the journey. Reach out to us for any inquiries, and let's collaborate.",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: AppColors.textLightGrey.withValues(alpha: 0.7),
-                      fontSize: 16,
-                      height: 1.6,
+                    SizedBox(
+                      width: 600,
+                      child: Text(
+                        "Have a vision you'd like to bring to life? We're here to help you navigate the journey. Reach out to us for any inquiries, and let's collaborate.",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          color: AppColors.textLightGrey.withValues(alpha: 0.7),
+                          fontSize: 16,
+                          height: 1.6,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
                   ],
                 );
               },
