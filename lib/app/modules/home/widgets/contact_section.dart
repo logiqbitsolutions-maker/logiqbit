@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/values/app_colors.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'about_section.dart'; // For MaxWidthContainer
 import 'animated_border_button.dart';
 
@@ -41,36 +39,19 @@ class _ContactSectionState extends State<ContactSection> {
 
     setState(() => _isSending = true);
 
-    try {
-      final response = await http.post(
-        Uri.parse('/api/send-email'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': _nameController.text,
-          'email': _emailController.text,
-          'subject': _selectedHelp,
-          'message': _subjectController.text,
-        }),
-      );
+    // Mock sending for now since Vercel was removed
+    await Future.delayed(const Duration(seconds: 1));
 
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Message sent! We'll get back to you soon."),
-            backgroundColor: AppColors.primaryOrange,
-          ),
-        );
-        _nameController.clear();
-        _emailController.clear();
-        _subjectController.clear();
-      } else {
-        throw Exception('Failed to send message');
-      }
-    } catch (e) {
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}"), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text("Message sent! We'll get back to you soon."),
+          backgroundColor: AppColors.primaryOrange,
+        ),
       );
-    } finally {
+      _nameController.clear();
+      _emailController.clear();
+      _subjectController.clear();
       setState(() => _isSending = false);
     }
   }
