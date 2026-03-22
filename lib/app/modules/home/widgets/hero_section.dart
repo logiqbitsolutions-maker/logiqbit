@@ -67,7 +67,7 @@ class HeroSection extends StatelessWidget {
                 const SizedBox(height: 40),
                 _buildDescription(),
                 const SizedBox(height: 60),
-                _buildCtaAndStatsSection(),
+                _buildCtaAndStatsSection(context),
               ],
             ),
           ),
@@ -113,73 +113,97 @@ class HeroSection extends StatelessWidget {
   // }
 
   Widget _buildMassiveHeading() {
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(
-        style: GoogleFonts.inter(
-          color: AppColors.textWhite,
-          fontSize: 86,
-          fontWeight: FontWeight.w900,
-          height: 1.0,
-          letterSpacing: -2.5,
-        ),
-        children: [
-          const TextSpan(text: "Building "),
-          const TextSpan(
-            text: "Innovative\n",
-            style: TextStyle(color: AppColors.primaryOrange),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = MediaQuery.of(context).size.width;
+        final isMobile = width < 800;
+        final isVerySmall = width < 450;
+
+        return RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            style: GoogleFonts.inter(
+              color: AppColors.textWhite,
+              fontSize: isVerySmall ? 42 : (isMobile ? 56 : 86),
+              fontWeight: FontWeight.w900,
+              height: 1.0,
+              letterSpacing: isMobile ? -1.5 : -2.5,
+            ),
+            children: [
+              const TextSpan(text: "Building "),
+              TextSpan(
+                text: isVerySmall ? "Innovative " : "Innovative\n",
+                style: const TextStyle(color: AppColors.primaryOrange),
+              ),
+              const TextSpan(text: "Digital Solutions"),
+            ],
           ),
-          const TextSpan(text: "Digital Solutions"),
-        ],
-      ),
-    ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0);
+        ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0);
+      },
+    );
   }
 
   Widget _buildDescription() {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 680),
-      child: Text(
-        "We specialize in building robust and scalable applications for your\nbusiness, driving growth through cutting-edge technology and human-\ncentric design.",
-        textAlign: TextAlign.center,
-        style: GoogleFonts.inter(
-          color: AppColors.textLightGrey,
-          fontSize: 18,
-          height: 1.5,
-          fontWeight: FontWeight.w400,
-        ),
-      ),
-    ).animate().fadeIn(delay: 400.ms);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = MediaQuery.of(context).size.width;
+        final isMobile = width < 800;
+
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 680),
+          child: Text(
+            isMobile
+                ? "We specialize in building robust and scalable applications for your business, driving growth through cutting-edge technology and human-centric design."
+                : "We specialize in building robust and scalable applications for your\nbusiness, driving growth through cutting-edge technology and human-\ncentric design.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              color: AppColors.textLightGrey,
+              fontSize: isMobile ? 15 : 18,
+              height: 1.5,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ).animate().fadeIn(delay: 400.ms);
+      },
+    );
   }
 
-  Widget _buildCtaAndStatsSection() {
+  Widget _buildCtaAndStatsSection(BuildContext context) {
     final controller = Get.find<HomeController>();
 
-    return Wrap(
-      alignment: WrapAlignment.center,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 32, // Horizontal spacing
-      runSpacing: 20, // Vertical spacing for mobile
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // First Button: Book a Free Call
-        _buildGlowingCtaButton(),
+        Flexible(child: _buildGlowingCtaButton()),
 
-        // Vertical Divider Line (Desktop par dekhase, Mobile ma auto-wrap thase)
+        SizedBox(width: isMobile ? 8 : 12),
+
+        // Vertical Divider Line
         Container(
-          height: 30,
-          width: 1.5,
+          height: isMobile ? 20 : 30,
+          width: 1,
           color: Colors.white.withValues(alpha: 0.15),
         ),
 
+        SizedBox(width: isMobile ? 8 : 12),
+
         // Second Button: View Our Work (Orange Theme)
-        AnimatedBorderButton(
-          showMovingBorder: false,
-          text: "View Our Work",
-          icon: Icons.grid_view_rounded,
-          onPressed: () =>
-              controller.scrollToSection(controller.portfolioKey, "Portfolio"),
-          fillOnHover: true, // Hover par fill thase
-          backgroundColor: AppColors.primaryOrange.withValues(alpha: 0.1),
-          textColor: AppColors.primaryOrange, // Default text color orange
+        Flexible(
+          child: AnimatedBorderButton(
+            showMovingBorder: false,
+            text: "View Our Work",
+            icon: Icons.grid_view_rounded,
+            onPressed: () => controller.scrollToSection(
+              controller.portfolioKey,
+              "Portfolio",
+            ),
+            fillOnHover: true,
+            backgroundColor: AppColors.primaryOrange.withValues(alpha: 0.1),
+            textColor: AppColors.primaryOrange,
+          ),
         ),
       ],
     ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0);

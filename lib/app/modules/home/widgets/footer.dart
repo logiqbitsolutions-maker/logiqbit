@@ -148,11 +148,7 @@ class Footer extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 32),
-        _contactItem(Icons.phone_outlined, "+91 [Your Phone Number]"),
-        const SizedBox(height: 16),
         _contactItem(Icons.email_outlined, "contact@logiqbit.com"),
-        const SizedBox(height: 16),
-        _contactItem(Icons.location_on_outlined, "Your Office Address..."),
       ],
     );
   }

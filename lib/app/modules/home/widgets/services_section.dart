@@ -122,14 +122,14 @@ class ServicesSection extends StatelessWidget {
         ],
       },
       {
-        "icon": Icons.bar_chart_rounded,
-        "title": "Digital Strategy",
+        "icon": Icons.psychology_rounded,
+        "title": "AI & Data Intel",
         "description":
-            "Go beyond code. We leverage market intelligence and user behavior data to define product roadmaps that ensure sustainable competitive advantage.",
+            "Harnessing machine learning and big data to drive business intelligence. We integrate custom LLMs and predictive models into your operations.",
         "features": [
-          "Market Disruption Analysis",
-          "Product Growth Optimization",
-          "Technical Risk Assessment",
+          "Custom LLM & Generative AI",
+          "Predictive Analytics Dashboards",
+          "Automated Data Pipelines",
         ],
       },
       {
@@ -155,14 +155,14 @@ class ServicesSection extends StatelessWidget {
         ],
       },
       {
-        "icon": Icons.psychology_rounded,
-        "title": "AI & Data Intel",
+        "icon": Icons.bar_chart_rounded,
+        "title": "Digital Strategy",
         "description":
-            "Harnessing machine learning and big data to drive business intelligence. We integrate custom LLMs and predictive models into your operations.",
+            "Go beyond code. We leverage market intelligence and user behavior data to define product roadmaps that ensure sustainable competitive advantage.",
         "features": [
-          "Custom LLM & Generative AI",
-          "Predictive Analytics Dashboards",
-          "Automated Data Pipelines",
+          "Market Disruption Analysis",
+          "Product Growth Optimization",
+          "Technical Risk Assessment",
         ],
       },
     ];

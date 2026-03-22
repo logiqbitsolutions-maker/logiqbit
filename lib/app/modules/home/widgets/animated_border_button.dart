@@ -54,9 +54,15 @@ class _AnimatedBorderButtonState extends State<AnimatedBorderButton>
         ? Colors.white
         : (widget.textColor ?? AppColors.textWhite);
 
+    final width = MediaQuery.of(context).size.width;
+    final isMobile = width < 600;
+
     Widget content = AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 12 : 24, // Reduced for mobile
+        vertical: isMobile ? 8 : 10,
+      ),
       decoration: BoxDecoration(
         color: _isHovered && widget.fillOnHover
             ? AppColors.primaryOrange
@@ -73,20 +79,24 @@ class _AnimatedBorderButtonState extends State<AnimatedBorderButton>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            widget.text,
-            style: GoogleFonts.inter(
-              color: currentContentColor, // Color dynamic banavyo
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
+          Flexible(
+            child: Text(
+              widget.text,
+              style: GoogleFonts.inter(
+                color: currentContentColor,
+                fontWeight: FontWeight.w600,
+                fontSize: isMobile ? 11 : 13, // Smaller on mobile
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           if (widget.icon != null) ...[
-            const SizedBox(width: 8),
+            SizedBox(width: isMobile ? 4 : 8),
             Icon(
               widget.icon,
-              color: currentContentColor, // Color dynamic banavyo
-              size: 14,
+              color: currentContentColor,
+              size: isMobile ? 12 : 14,
             ),
           ],
         ],

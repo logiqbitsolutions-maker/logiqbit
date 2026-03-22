@@ -249,42 +249,49 @@ class WhyUsSection extends StatelessWidget {
         quote:
             "They delivered exceptional results, combining strong technical expertise, clean and scalable code, and clear communication throughout the process.",
         tag: "(React JS / JavaScript)",
+        imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150",
       ),
       _ReviewData(
         name: "SK Smaira",
         info: "Tech Leader • India",
         quote:
             "They delivered on time according to our requirement. We have new projects too; we will approach them if they can do on our budget.",
+        imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150",
       ),
       _ReviewData(
         name: "Marcus Chen",
         info: "CTO, NEXACORP",
         quote:
             "Logiqbit transformed our legacy infrastructure into a high-performance cloud ecosystem. Their technical depth is unparalleled.",
+        imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150",
       ),
       _ReviewData(
         name: "Sarah Jenkins",
         info: "Product Head, FinFlow",
         quote:
             "The level of scalability we've achieved with their modular architecture has allowed us to grow 3x without any downtime.",
+        imageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150",
       ),
       _ReviewData(
         name: "David Miller",
         info: "VP Ops, Global Retail",
         quote:
             "Their team doesn't just build code; they build business value. A strategic partner that actually understands ROI.",
+        imageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150",
       ),
       _ReviewData(
         name: "Anna Petrova",
         info: "Founder, GreenTech",
         quote:
             "Working with Logiqbit was a game-changer for our startup. They delivered a complex mobile app in record time.",
+        imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150",
       ),
       _ReviewData(
         name: "James Wilson",
         info: "CEO, TechSphere",
         quote:
             "Logiqbit's team is not just a group of developers, but a group of thinkers. They understood our vision from day one.",
+        imageUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150",
       ),
     ];
 
@@ -416,12 +423,14 @@ class _ReviewData {
   final String info;
   final String quote;
   final String? tag;
+  final String? imageUrl;
 
   _ReviewData({
     required this.name,
     required this.info,
     required this.quote,
     this.tag,
+    this.imageUrl,
   });
 }
 
@@ -459,10 +468,24 @@ class _ReviewCard extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white24,
-                    size: 20,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: data.imageUrl != null
+                        ? Image.network(
+                            data.imageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                              Icons.person,
+                              color: Colors.white24,
+                              size: 20,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.person,
+                            color: Colors.white24,
+                            size: 20,
+                          ),
                   ),
                 ),
                 const SizedBox(width: 10),

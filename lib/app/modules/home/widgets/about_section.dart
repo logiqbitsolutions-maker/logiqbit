@@ -162,15 +162,18 @@ class _AboutSectionState extends State<AboutSection>
                 ],
               )
             else
-              Wrap(
-                spacing: 20,
-                runSpacing: 24,
-                children: [
-                  _buildStatItem("50", "APPS DELIVERED", "+"),
-                  _buildStatItem("1", "USERS REACHED", "K+"),
-                  _buildStatItem("96", "CLIENT RETENTION", "%"),
-                  _buildStatItem("5", "CLIENT RATING", "/5"),
-                ],
+              Center(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 40,
+                  runSpacing: 32,
+                  children: [
+                    _buildStatItem("50", "APPS DELIVERED", "+"),
+                    _buildStatItem("1", "USERS REACHED", "K+"),
+                    _buildStatItem("96", "CLIENT RETENTION", "%"),
+                    _buildStatItem("5", "CLIENT RATING", "/5"),
+                  ],
+                ),
               ),
           ],
         )

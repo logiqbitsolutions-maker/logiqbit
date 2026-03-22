@@ -68,7 +68,7 @@ class _ContactSectionState extends State<ContactSection> {
             // Intro Section
             LayoutBuilder(
               builder: (context, constraints) {
-                final isMobile = constraints.maxWidth < 800;
+                final isMobile = constraints.maxWidth < 600;
                 return Column(
                   children: [
                     RichText(
@@ -191,87 +191,102 @@ class _ContactSectionState extends State<ContactSection> {
   }
 
   Widget _buildRightForm() {
+    final isMobile = MediaQuery.of(context).size.width < 800;
     return Container(
-          padding: const EdgeInsets.all(48),
-          decoration: BoxDecoration(
-            color: AppColors.cardBlack,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.06),
-              width: 1,
+      padding: EdgeInsets.all(isMobile ? 24 : 48),
+      decoration: BoxDecoration(
+        color: AppColors.cardBlack,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.06),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Row 1: Name + Email
+          if (!isMobile)
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                    label: "YOUR NAME",
+                    hint: "John Doe",
+                    controller: _nameController,
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  child: _buildTextField(
+                    label: "BUSINESS EMAIL",
+                    hint: "john@company.com",
+                    controller: _emailController,
+                  ),
+                ),
+              ],
+            )
+          else ...[
+            _buildTextField(
+              label: "YOUR NAME",
+              hint: "John Doe",
+              controller: _nameController,
+            ),
+            const SizedBox(height: 24),
+            _buildTextField(
+              label: "BUSINESS EMAIL",
+              hint: "john@company.com",
+              controller: _emailController,
+            ),
+          ],
+          const SizedBox(height: 24),
+          // Row 2: Help dropdown
+          _buildDropdown(),
+          const SizedBox(height: 24),
+          // Row 3: Subject
+          _buildTextField(
+            label: "SUBJECT",
+            hint: "Tell us about your project...",
+            maxLines: 4,
+            controller: _subjectController,
+          ),
+          const SizedBox(height: 36),
+          // Submit button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _isSending ? null : _submitForm,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryOrange,
+                foregroundColor: AppColors.textWhite,
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: _isSending
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(
+                      "Send Message",
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Row 1: Name + Email
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextField(
-                      label: "YOUR NAME",
-                      hint: "John Doe",
-                      controller: _nameController,
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    child: _buildTextField(
-                      label: "BUSINESS EMAIL",
-                      hint: "john@company.com",
-                      controller: _emailController,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              // Row 2: Help dropdown
-              _buildDropdown(),
-              const SizedBox(height: 24),
-              // Row 3: Subject
-              _buildTextField(
-                label: "SUBJECT",
-                hint: "Tell us about your project...",
-                maxLines: 4,
-                controller: _subjectController,
-              ),
-              const SizedBox(height: 36),
-              // Submit button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isSending ? null : _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryOrange,
-                    foregroundColor: AppColors.textWhite,
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _isSending
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(
-                          "Send Message",
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                ),
-              ),
-            ],
-          ),
-        )
+        ],
+      ),
+    )
         .animate()
         .fadeIn(delay: 200.ms, duration: 800.ms)
         .slideX(begin: 0.05, end: 0);
@@ -351,6 +366,7 @@ class _ContactSectionState extends State<ContactSection> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
+          isExpanded: true,
           value: _selectedHelp,
           dropdownColor: const Color(0xFF1A1A1A),
           icon: const Icon(

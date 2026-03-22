@@ -70,7 +70,7 @@ class IntegrationsSection extends StatelessWidget {
         SizedBox(
           width: 700,
           child: Text(
-            "Logiqbit leverages Flutter, Firebase, and cutting-edge AI to build high-performance, scalable, and intelligent digital ecosystems for your business.",
+            "From custom payment gateways to 24/7 dedicated support, we integrate the essential pillars of modern digital commerce into a unified, intelligent ecosystem.",
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               color: AppColors.textGrey,
@@ -94,13 +94,13 @@ class IntegrationsSection extends StatelessWidget {
     return _AnimatedMapArea(constraints: constraints);
   }
 
-  Widget _buildCoreHub() {
+  Widget _buildCoreHub(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-              width: 80,
-              height: 80,
+              width: MediaQuery.of(context).size.width < 450 ? 60 : 80,
+              height: MediaQuery.of(context).size.width < 450 ? 60 : 80,
               decoration: BoxDecoration(
                 color: AppColors.primaryOrange,
                 borderRadius: BorderRadius.circular(20),
@@ -203,18 +203,10 @@ class _AnimatedMapAreaState extends State<_AnimatedMapArea>
       ),
       _IntegrationNode(
         iconData: Icons.local_fire_department_rounded,
-        iconColor: Colors.orangeAccent,
-        category: "DATABASE",
-        title: "Cloud Firestore",
-        delay: 700,
-        bobDelay: 800,
-      ),
-      _IntegrationNode(
-        iconData: Icons.local_fire_department_rounded,
         iconColor: Colors.redAccent,
         category: "BACKEND",
         title: "Firebase",
-        delay: 800,
+        delay: 700,
         bobDelay: 200,
       ),
       _IntegrationNode(
@@ -222,51 +214,60 @@ class _AnimatedMapAreaState extends State<_AnimatedMapArea>
         iconColor: Colors.tealAccent,
         category: "INTELLIGENCE",
         title: "Gemini AI",
-        delay: 900,
+        delay: 800,
         bobDelay: 600,
-      ),
-      _IntegrationNode(
-        iconData: Icons.security_rounded,
-        iconColor: Colors.blueAccent,
-        category: "SECURITY",
-        title: "Firebase Auth",
-        delay: 1000,
-        bobDelay: 100,
       ),
       _IntegrationNode(
         iconData: Icons.cloud_done_rounded,
         iconColor: Colors.greenAccent,
         category: "LOGIC",
         title: "Cloud Functions",
-        delay: 1100,
+        delay: 900,
         bobDelay: 500,
+      ),
+      _IntegrationNode(
+        iconData: Icons.payments_rounded,
+        iconColor: Colors.amberAccent,
+        category: "PAYMENT",
+        title: "Pay Gateway",
+        delay: 1000,
+        bobDelay: 300,
+      ),
+      _IntegrationNode(
+        iconData: Icons.support_agent_rounded,
+        iconColor: Colors.purpleAccent,
+        category: "SUPPORT",
+        title: "24/7 Support",
+        delay: 1100,
+        bobDelay: 700,
       ),
     ];
 
     // Define shared positioning logic (Truly radial/circular)
     List<Offset> getNodeCenters(Size size) {
       final center = Offset(size.width / 2, size.height / 2);
-      
+
+      // Calculate radius based on available width and nodes size
       // Calculate radius based on available width and nodes size
       final isVerySmall = size.width < 450;
       final isSmall = size.width < 800;
-      final nodeW = isVerySmall ? 110.0 : (isSmall ? 140.0 : 200.0);
-      
+      final nodeW = isVerySmall ? 100.0 : (isSmall ? 140.0 : 200.0);
+
       // Radius should ensure nodes stay within bounds
       // (size.width - nodeW) / 2 is the maximum radius we can have
       final double radius = math.min(
-        (size.width - nodeW) * 0.48, // slightly inside
-        (size.height - 120) * 0.48 // Leave some vertical margin
+        (size.width - nodeW) * 0.45, // slightly more inside for small screens
+        (size.height - 100) * 0.45, // Leave some vertical margin
       );
 
       // Define angles in degrees (0 = Right, 90 = Top, etc.)
       // Matching the visual feel of the web view
       const angles = [
         140.0, // Node 0: Top Left
-        90.0,  // Node 1: Top Center
-        40.0,  // Node 2: Top Right
+        90.0, // Node 1: Top Center
+        40.0, // Node 2: Top Right
         180.0, // Node 3: Mid Left
-        0.0,   // Node 4: Mid Right
+        0.0, // Node 4: Mid Right
         220.0, // Node 5: Bottom Left
         320.0, // Node 6: Bottom Right
       ];
@@ -280,7 +281,10 @@ class _AnimatedMapAreaState extends State<_AnimatedMapArea>
       }).toList();
     }
 
-    final size = Size(widget.constraints.maxWidth, widget.constraints.maxWidth < 600 ? 500.0 : 600.0);
+    final size = Size(
+      widget.constraints.maxWidth,
+      widget.constraints.maxWidth < 600 ? 400.0 : 600.0,
+    );
     final isSmall = size.width < 800;
     final centers = getNodeCenters(size);
     final isVerySmall = size.width < 450;
@@ -310,49 +314,49 @@ class _AnimatedMapAreaState extends State<_AnimatedMapArea>
           ),
 
           // Central Hub
-          Positioned(child: const IntegrationsSection()._buildCoreHub()),
+          Positioned(child: const IntegrationsSection()._buildCoreHub(context)),
 
           // Nodes
           // Node 0
           Positioned(
-            left: centers[0].dx - nodeW/2,
-            top: centers[0].dy - nodeH/2,
+            left: centers[0].dx - nodeW / 2,
+            top: centers[0].dy - nodeH / 2,
             child: nodes[0],
           ),
           // Node 1
           Positioned(
-            left: centers[1].dx - nodeW/2,
-            top: centers[1].dy - nodeH/2,
+            left: centers[1].dx - nodeW / 2,
+            top: centers[1].dy - nodeH / 2,
             child: nodes[1],
           ),
           // Node 2
           Positioned(
-            left: centers[2].dx - nodeW/2,
-            top: centers[2].dy - nodeH/2,
+            left: centers[2].dx - nodeW / 2,
+            top: centers[2].dy - nodeH / 2,
             child: nodes[2],
           ),
           // Node 3
           Positioned(
-            left: centers[3].dx - nodeW/2,
-            top: centers[3].dy - nodeH/2,
+            left: centers[3].dx - nodeW / 2,
+            top: centers[3].dy - nodeH / 2,
             child: nodes[3],
           ),
           // Node 4
           Positioned(
-            left: centers[4].dx - nodeW/2,
-            top: centers[4].dy - nodeH/2,
+            left: centers[4].dx - nodeW / 2,
+            top: centers[4].dy - nodeH / 2,
             child: nodes[4],
           ),
           // Node 5
           Positioned(
-            left: centers[5].dx - nodeW/2,
-            top: centers[5].dy - nodeH/2,
+            left: centers[5].dx - nodeW / 2,
+            top: centers[5].dy - nodeH / 2,
             child: nodes[5],
           ),
           // Node 6
           Positioned(
-            left: centers[6].dx - nodeW/2,
-            top: centers[6].dy - nodeH/2,
+            left: centers[6].dx - nodeW / 2,
+            top: centers[6].dy - nodeH / 2,
             child: nodes[6],
           ),
         ],
@@ -383,89 +387,92 @@ class _IntegrationNode extends StatelessWidget {
     final controller = Get.find<HomeController>();
     final width = MediaQuery.of(context).size.width;
     final isVerySmall = width < 450;
-    final isSmall = width < 800;
 
     return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () =>
-            controller.scrollToSection(controller.contactKey, "Contact Us"),
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          width: isVerySmall ? 110 : (isSmall ? 140 : 200),
-          padding: EdgeInsets.all(isVerySmall ? 6 : (isSmall ? 8 : 12)),
-          decoration: BoxDecoration(
-            color: const Color(0xFF111113).withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(isVerySmall ? 8 : 16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.5),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () =>
+                controller.scrollToSection(controller.contactKey, "Contact Us"),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              width: isVerySmall ? 105 : 140, // Unified mobile widths
+              padding: EdgeInsets.all(isVerySmall ? 6 : 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF111113).withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(isVerySmall ? 10 : 16),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(isVerySmall ? 4 : (isSmall ? 6 : 10)),
-                decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(isVerySmall ? 6 : 10),
-                ),
-                child: Icon(
-                  iconData,
-                  color: iconColor,
-                  size: isVerySmall ? 14 : (isSmall ? 18 : 24),
-                ),
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      category,
-                      style: GoogleFonts.inter(
-                        color: const Color(0xFF888888),
-                        fontSize: isVerySmall ? 6 : (isSmall ? 8 : 10),
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: isVerySmall ? 0.5 : 1,
-                      ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(isVerySmall ? 5 : 8),
+                    decoration: BoxDecoration(
+                      color: iconColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(isVerySmall ? 8 : 10),
                     ),
-                    Text(
-                      title,
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: isVerySmall ? 9 : (isSmall ? 11 : 14),
-                        fontWeight: FontWeight.w700,
-                      ),
+                    child: Icon(
+                      iconData,
+                      color: iconColor,
+                      size: isVerySmall ? 14 : 18,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          category,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF888888),
+                            fontSize: isVerySmall ? 7 : 9,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          title,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: isVerySmall ? 9 : 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    )
-    .animate()
-    .fadeIn(
-      duration: const Duration(milliseconds: 600),
-      delay: Duration(milliseconds: delay),
-    )
-    .scale(begin: const Offset(0.9, 0.9))
-    .then()
-    .animate(onPlay: (controller) => controller.repeat(reverse: true))
-    .moveY(
-      begin: -5,
-      end: 5,
-      duration: const Duration(seconds: 3),
-      delay: Duration(milliseconds: bobDelay),
-      curve: Curves.easeInOut,
-    );
+        )
+        .animate()
+        .fadeIn(
+          duration: const Duration(milliseconds: 600),
+          delay: Duration(milliseconds: delay),
+        )
+        .scale(begin: const Offset(0.9, 0.9))
+        .then()
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+        .moveY(
+          begin: -5,
+          end: 5,
+          duration: const Duration(seconds: 3),
+          delay: Duration(milliseconds: bobDelay),
+          curve: Curves.easeInOut,
+        );
   }
 }
 

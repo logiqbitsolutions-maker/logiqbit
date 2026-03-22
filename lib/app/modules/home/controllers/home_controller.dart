@@ -43,10 +43,49 @@ class HomeController extends GetxController {
 
     scrollController.addListener(() {
       _calculateProgress();
+      _updateActiveSectionOnScroll();
       if (scrollController.hasClients) {
         updateScrollOpacity(scrollController.position.pixels);
       }
     });
+  }
+
+  void _updateActiveSectionOnScroll() {
+    if (!scrollController.hasClients) return;
+
+    final List<Map<String, dynamic>> sections = [
+      {"name": "Home", "key": heroKey},
+      {"name": "About Us", "key": aboutKey},
+      {"name": "Services", "key": servicesKey},
+      {"name": "Why Logiqbit", "key": whyUsKey},
+      {"name": "Why Logiqbit", "key": integrationsKey},
+      {"name": "Portfolio", "key": portfolioKey},
+      {"name": "Portfolio", "key": contactKey},
+    ];
+
+    String bestMatch = activeSection.value;
+    double minTopDistance = 300; // Threshold for a section to be considered "active" at the top
+
+    for (var section in sections) {
+      final key = section['key'] as GlobalKey;
+      final context = key.currentContext;
+      if (context != null) {
+        final box = context.findRenderObject() as RenderBox?;
+        if (box != null) {
+          final position = box.localToGlobal(Offset.zero).dy;
+          
+          // If the top of the section is above the threshold, it becomes the potential active section
+          // As we iterate in order, the furthest section down that has passed the threshold will win
+          if (position < minTopDistance) {
+            bestMatch = section['name'];
+          }
+        }
+      }
+    }
+
+    if (activeSection.value != bestMatch) {
+      activeSection.value = bestMatch;
+    }
   }
 
   void _calculateProgress() {

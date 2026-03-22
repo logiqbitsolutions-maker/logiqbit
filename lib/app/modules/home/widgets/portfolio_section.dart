@@ -34,6 +34,7 @@ class _PortfolioSectionState extends State<PortfolioSection> {
   }
 
   void _onScroll() {
+    if (!_scrollController.hasClients) return;
     double cardWidthWithSpacing = _lastCardWidth + 24;
     int newIndex =
         ((_scrollController.offset / cardWidthWithSpacing).round() + 1);
@@ -50,9 +51,11 @@ class _PortfolioSectionState extends State<PortfolioSection> {
   }
 
   void _scroll(bool forward) {
-    const double scrollAmount = 600;
+    if (!_scrollController.hasClients) return;
+    double cardWidthWithSpacing = _lastCardWidth + 24;
     final double target =
-        _scrollController.offset + (forward ? scrollAmount : -scrollAmount);
+        _scrollController.offset +
+        (forward ? cardWidthWithSpacing : -cardWidthWithSpacing);
     _scrollController.animateTo(
       target.clamp(0, _scrollController.position.maxScrollExtent),
       duration: const Duration(milliseconds: 700),
@@ -66,11 +69,13 @@ class _PortfolioSectionState extends State<PortfolioSection> {
       _selectedCategory = category;
       _currentIndex = 1;
     });
-    _scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeOutQuart,
-    );
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutQuart,
+      );
+    }
   }
 
   // Dummy Data for Apps
@@ -251,92 +256,53 @@ class _PortfolioSectionState extends State<PortfolioSection> {
                   ),
                 SizedBox(height: isMobile ? 40 : 60),
 
-                // Portfolio Layout mapping all currentData dynamically
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SingleChildScrollView(
-                      controller: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Row(
-                          children: currentData.asMap().entries.map((entry) {
-                            int idx = entry.key;
-                            var data = entry.value;
+                // Portfolio Layout using Horizontal Scroll back
+                SingleChildScrollView(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Row(
+                      children: currentData.asMap().entries.map((entry) {
+                        int idx = entry.key;
+                        var data = entry.value;
 
-                            double cardWidth = constraints.maxWidth;
-                            if (constraints.maxWidth > 1100) {
-                              cardWidth = (1200 - 24) / 2;
-                              if (cardWidth > constraints.maxWidth / 2) {
-                                cardWidth = (constraints.maxWidth - 24) / 2;
-                              }
-                            } else if (constraints.maxWidth > 700) {
-                              cardWidth = constraints.maxWidth * 0.8;
-                            }
+                        double cardWidth = constraints.maxWidth;
+                        if (constraints.maxWidth > 900) {
+                          cardWidth = (1200 - 48) / 3; // 3 columns
+                        } else if (constraints.maxWidth > 600) {
+                          cardWidth = constraints.maxWidth * 0.7; // Tablet
+                        }
 
-                            // Store for scroll indicator calculation
-                            _lastCardWidth = cardWidth;
+                        _lastCardWidth = cardWidth;
 
-                            return Container(
-                              width: cardWidth,
-                              margin: const EdgeInsets.only(right: 24),
-                              child: PortfolioCard(
-                                data: data,
-                                delay: idx * 100,
-                                controller: controller,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
+                        return Container(
+                          width: cardWidth,
+                          margin: const EdgeInsets.only(right: 24),
+                          child: PortfolioCard(
+                            data: data,
+                            delay: idx * 100,
+                            controller: controller,
+                          ),
+                        );
+                      }).toList(),
                     ),
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 50),
                 // Navigation Indicator and Buttons (Aligned to the Right)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8, bottom: 12),
-                      child: RichText(
-                        text: TextSpan(
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: "$_currentIndex ",
-                              style: const TextStyle(
-                                color: AppColors.primaryOrange,
-                              ),
-                            ),
-                            TextSpan(
-                              text: "/ ${currentData.length}",
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.5),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    _PortfolioNavButton(
+                      icon: Icons.arrow_back_ios_new_rounded,
+                      onTap: () => _scroll(false),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        _PortfolioNavButton(
-                          icon: Icons.arrow_back_ios_new_rounded,
-                          onTap: () => _scroll(false),
-                        ),
-                        const SizedBox(width: 16),
-                        _PortfolioNavButton(
-                          icon: Icons.arrow_forward_ios_rounded,
-                          onTap: () => _scroll(true),
-                        ),
-                      ],
+                    const SizedBox(width: 16),
+                    _PortfolioNavButton(
+                      icon: Icons.arrow_forward_ios_rounded,
+                      onTap: () => _scroll(true),
                     ),
                   ],
                 ),
@@ -533,60 +499,35 @@ class PortfolioCard extends StatelessWidget {
     return HoverCard(
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF16110F),
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
+              color: const Color(
+                0xFF0D0D0D,
+              ), // Deeper dark background to match reference
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.4),
+                  color: Colors.black.withValues(alpha: 0.5),
                   blurRadius: 40,
                   offset: const Offset(0, 20),
                 ),
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.circular(24),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  bool isStacked = constraints.maxWidth < 450;
+                  bool isMobile = constraints.maxWidth < 600;
 
-                  if (isStacked) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        AspectRatio(
-                          aspectRatio: 1.2,
-                          child: _buildImageSection(
-                            context,
-                            isStacked: isStacked,
-                          ),
-                        ),
-                        _buildContentSection(context, isMobile: true),
-                      ],
-                    );
-                  }
-
-                  return IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 5,
-                          child: _buildImageSection(
-                            context,
-                            isStacked: isStacked,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 7,
-                          child: _buildContentSection(
-                            context,
-                            isMobile: isStacked,
-                          ),
-                        ),
-                      ],
-                    ),
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 1.5,
+                        child: _buildImageSection(context, isStacked: true),
+                      ),
+                      _buildContentSection(context, isMobile: isMobile),
+                    ],
                   );
                 },
               ),
@@ -609,85 +550,20 @@ class PortfolioCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: data['imageBgColor'],
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child:
-              Container(
-                    constraints: BoxConstraints(
-                      maxWidth: isStacked ? 240 : 220,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(32),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25),
-                          blurRadius: 30,
-                          offset: const Offset(0, 15),
-                        ),
-                      ],
-                    ),
-                    child: AspectRatio(
-                      aspectRatio: 9 / 19.5,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF050505),
-                          borderRadius: BorderRadius.circular(32),
-                          border: Border.all(
-                            color: const Color(0xFF1A1A1A),
-                            width: 6,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(26),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              Image.network(
-                                data['imageUrl'],
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: const Color(0xFF1A1A1A),
-                                    child: const Icon(
-                                      Icons.phone_iphone,
-                                      color: Colors.white24,
-                                      size: 30,
-                                    ),
-                                  );
-                                },
-                              ),
-                              Positioned(
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                child: Center(
-                                  child: Container(
-                                    width: 60,
-                                    height: 18,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF1A1A1A),
-                                      borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(12),
-                                        bottomRight: Radius.circular(12),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                  .animate(onPlay: (anim) => anim.repeat(reverse: true))
-                  .moveY(
-                    begin: 0,
-                    end: -8,
-                    duration: const Duration(milliseconds: 2500),
-                    curve: Curves.easeInOut,
-                  ),
+      child: ClipRRect(
+        child: Image.network(
+          data['imageUrl'],
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: const Color(0xFF1A1A1A),
+              child: const Icon(
+                Icons.image_not_supported_outlined,
+                color: Colors.white24,
+                size: 30,
+              ),
+            );
+          },
         ),
       ),
     );
@@ -695,10 +571,7 @@ class PortfolioCard extends StatelessWidget {
 
   Widget _buildContentSection(BuildContext context, {required bool isMobile}) {
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20.0 : 36.0,
-        vertical: isMobile ? 20.0 : 30.0,
-      ),
+      padding: EdgeInsets.all(isMobile ? 24.0 : 28.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -708,66 +581,55 @@ class PortfolioCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF241C18),
+                  color: const Color(0xFF1A1512), // Deep warm dark for icon bg
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.primaryOrange.withValues(alpha: 0.1),
+                    color: AppColors.primaryOrange.withValues(alpha: 0.15),
                   ),
                 ),
                 child: Icon(
                   data['icon'],
                   color: AppColors.primaryOrange,
-                  size: 16,
+                  size: 18,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   data['category'],
                   style: GoogleFonts.inter(
                     color: AppColors.primaryOrange,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900, // Extra bold like reference
+                    letterSpacing: 1.5,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
             data['title'],
             style: GoogleFonts.inter(
               color: AppColors.textWhite,
-              fontSize: isMobile ? 26 : 32,
+              fontSize: 28, // Larger title
               fontWeight: FontWeight.w800,
-              letterSpacing: -1,
-              height: 1.2,
+              letterSpacing: -0.8,
+              height: 1.1,
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            data['description'],
-            style: GoogleFonts.inter(
-              color: AppColors.textLightGrey.withValues(alpha: 0.7),
-              fontSize: isMobile ? 14 : 15,
-              height: 1.7,
-            ),
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: 12,
+            runSpacing: 10,
             children: (data['tags'] as List<String>).map((tag) {
               return Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: 14,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.04),
+                  color: const Color(0xFF1A1A1A), // Darker pill bg
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.08),
@@ -776,45 +638,50 @@ class PortfolioCard extends StatelessWidget {
                 child: Text(
                   tag,
                   style: GoogleFonts.inter(
-                    color: AppColors.textLightGrey,
-                    fontSize: 11,
+                    color: Colors.white70,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               );
             }).toList(),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 32),
           InkWell(
             onTap: () => _showProjectDetails(context, data),
             borderRadius: BorderRadius.circular(12),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppColors.primaryOrange.withValues(alpha: 0.4),
+                  color: AppColors.primaryOrange.withValues(alpha: 0.6),
                   width: 1.5,
                 ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "View Details",
-                    style: GoogleFonts.inter(
-                      color: AppColors.primaryOrange,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15,
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "View Details",
+                      style: GoogleFonts.inter(
+                        color: AppColors.primaryOrange,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Icon(
-                    Icons.north_east_rounded,
-                    size: 18,
-                    color: AppColors.primaryOrange,
-                  ),
-                ],
+                    const SizedBox(width: 10),
+                    const Icon(
+                      Icons
+                          .north_east_rounded, // Better arrow for reference look
+                      size: 20,
+                      color: AppColors.primaryOrange,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
