@@ -40,7 +40,7 @@ class _AboutSectionState extends State<AboutSection>
       onVisibilityChanged: (info) {
         if (!mounted) return;
         final visible =
-            info.visibleFraction > 0.45; // Significantly higher threshold
+            info.visibleFraction > 0.1; // Reduced threshold for faster trigger
         if (visible && !_hasAnimated) {
           _leftController.forward();
           _rightController.forward();
@@ -131,7 +131,7 @@ class _AboutSectionState extends State<AboutSection>
             Text(
               "Founded on the principles of logic and digital bit-level precision, Logiqbit Solutions is a full-service technology partner committed to solving complex business challenges with elegant digital products.",
               style: GoogleFonts.inter(
-                color: AppColors.textLightGrey,
+                color: const Color(0xFFF9F9F9).withValues(alpha: 0.6),
                 fontSize: isDesktop ? 16 : 14,
                 height: 1.6,
               ),
@@ -140,7 +140,7 @@ class _AboutSectionState extends State<AboutSection>
             Text(
               "We bridge the gap between ambitious ideas and technical reality, delivering scalable software that drives growth and operational efficiency for modern enterprises.",
               style: GoogleFonts.inter(
-                color: AppColors.textLightGrey,
+                color: const Color(0xFFF9F9F9).withValues(alpha: 0.6),
                 fontSize: isDesktop ? 16 : 14,
                 height: 1.6,
               ),
@@ -152,7 +152,9 @@ class _AboutSectionState extends State<AboutSection>
                 children: [
                   Flexible(child: _buildStatItem("50", "APPS DELIVERED", "+")),
                   _buildDivider(),
-                  Flexible(child: _buildStatItem("1", "USERS REACHED", "K+")),
+                  Flexible(
+                      child: _buildStatItem("1000", "USERS REACHED", "+",
+                          formatK: true)),
                   _buildDivider(),
                   Flexible(
                     child: _buildStatItem("96", "CLIENT RETENTION", "%"),
@@ -169,7 +171,7 @@ class _AboutSectionState extends State<AboutSection>
                   runSpacing: 32,
                   children: [
                     _buildStatItem("50", "APPS DELIVERED", "+"),
-                    _buildStatItem("1", "USERS REACHED", "K+"),
+                    _buildStatItem("1000", "USERS REACHED", "+", formatK: true),
                     _buildStatItem("96", "CLIENT RETENTION", "%"),
                     _buildStatItem("5", "CLIENT RATING", "/5"),
                   ],
@@ -178,7 +180,7 @@ class _AboutSectionState extends State<AboutSection>
           ],
         )
         .animate(controller: _leftController, autoPlay: false)
-        .fadeIn(duration: 2000.ms, curve: Curves.easeOutCubic)
+        .fadeIn(duration: 800.ms, curve: Curves.easeOutCubic)
         .slideX(begin: -0.03, end: 0, curve: Curves.easeOutQuart);
   }
 
@@ -203,7 +205,7 @@ class _AboutSectionState extends State<AboutSection>
           ],
         )
         .animate(controller: _rightController, autoPlay: false)
-        .fadeIn(duration: 2000.ms, curve: Curves.easeOutCubic)
+        .fadeIn(duration: 800.ms, curve: Curves.easeOutCubic)
         .slideY(begin: 0.03, end: 0, curve: Curves.easeOutQuart);
   }
 
@@ -216,13 +218,15 @@ class _AboutSectionState extends State<AboutSection>
     );
   }
 
-  Widget _buildStatItem(String value, String label, String suffix) {
+  Widget _buildStatItem(String value, String label, String suffix,
+      {bool formatK = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AnimatedCounter(
           targetValue: double.tryParse(value) ?? 0,
           suffix: suffix,
+          formatK: formatK,
           style: GoogleFonts.inter(
             color: AppColors.primaryOrange,
             fontSize: 32,
@@ -234,7 +238,7 @@ class _AboutSectionState extends State<AboutSection>
         Text(
           label,
           style: GoogleFonts.inter(
-            color: AppColors.textLightGrey,
+            color: const Color(0xFFF9F9F9).withValues(alpha: 0.6),
             fontSize: 10,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.5,
@@ -299,7 +303,7 @@ class _AboutSectionState extends State<AboutSection>
                   Text(
                     description,
                     style: GoogleFonts.inter(
-                      color: AppColors.textGrey,
+                      color: const Color(0xFFF9F9F9).withValues(alpha: 0.6),
                       fontSize: isDesktop ? 14 : 13,
                       height: 1.6,
                     ),

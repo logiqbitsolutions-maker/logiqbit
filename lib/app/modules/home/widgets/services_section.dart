@@ -101,69 +101,39 @@ class ServicesSection extends StatelessWidget {
     final cardsData = [
       {
         "icon": Icons.smartphone_rounded,
-        "title": "Mobile Engineering",
+        "title": "Mobile App Development",
         "description":
-            "We architect high-performance native and cross-platform ecosystems. From Flutter speed-to-market to Swift's uncompromising performance, we build for scale.",
-        "features": [
-          "React Native & Flutter",
-          "iOS (Swift) & Android (Kotlin)",
-          "Real-time Biometric Security",
-        ],
+            "Expert engineering of high-performance native and cross-platform applications, delivering seamless experiences across all mobile devices.",
+      },
+      {
+        "icon": Icons.sports_esports_rounded,
+        "title": "Game Development",
+        "description":
+            "Designing immersive 2D and 3D gaming experiences with advanced mechanics and high-performance graphics for all major platforms.",
       },
       {
         "icon": Icons.language_rounded,
-        "title": "Full-Stack Web",
+        "title": "Web Development",
         "description":
-            "Next-generation web applications powered by React, Vue, and Node.js. We focus on sub-second load times and complex architectural reliability.",
-        "features": [
-          "Enterprise SaaS Platforms",
-          "Headless CMS Architecture",
-          "Advanced Web3 Integration",
-        ],
+            "Building responsive, scalable web applications using modern frameworks, optimized for high performance and exceptional user engagement.",
       },
       {
-        "icon": Icons.psychology_rounded,
-        "title": "AI & Data Intel",
+        "icon": Icons.cloud_sync_rounded,
+        "title": "CI/CD & DevOps",
         "description":
-            "Harnessing machine learning and big data to drive business intelligence. We integrate custom LLMs and predictive models into your operations.",
-        "features": [
-          "Custom LLM & Generative AI",
-          "Predictive Analytics Dashboards",
-          "Automated Data Pipelines",
-        ],
+            "Optimizing software delivery with automated pipelines and cloud infrastructure, ensuring faster releases and superior system reliability.",
       },
       {
         "icon": Icons.design_services_rounded,
-        "title": "Experience Design",
+        "title": "UI/UX Design",
         "description":
-            "Where aesthetics meets utility. We create high-fidelity design systems that reflect your brand ethos while maximizing user retention & conversion.",
-        "features": [
-          "UI/UX & Interaction Design",
-          "Design Systems & Component Libraries",
-          "Conversion Rate Optimization (CRO)",
-        ],
+            "Creating user-centric, visually stunning interfaces that prioritize usability and brand identity to deliver intuitive digital experiences.",
       },
       {
-        "icon": Icons.cloud_rounded,
-        "title": "Cloud Infrastructure",
+        "icon": Icons.fact_check_rounded,
+        "title": "Testing & QA",
         "description":
-            "Modern DevOps practices utilizing AWS, Azure, and Google Cloud. We build multi-region, auto-scaling architectures with 99.99% targeted uptime.",
-        "features": [
-          "CI/CD Automation Pipelines",
-          "Microservices Migration",
-          "Cloud Cost Optimization",
-        ],
-      },
-      {
-        "icon": Icons.bar_chart_rounded,
-        "title": "Digital Strategy",
-        "description":
-            "Go beyond code. We leverage market intelligence and user behavior data to define product roadmaps that ensure sustainable competitive advantage.",
-        "features": [
-          "Market Disruption Analysis",
-          "Product Growth Optimization",
-          "Technical Risk Assessment",
-        ],
+            "Implementing rigorous quality assurance and automated testing strategies to ensure bug-free, highly reliable, and secure software products.",
       },
     ];
 
@@ -178,7 +148,6 @@ class ServicesSection extends StatelessWidget {
           icon: data["icon"] as IconData,
           title: data["title"] as String,
           description: data["description"] as String,
-          features: data["features"] as List<String>,
           delay: idx * 100,
           width: cardWidth,
           controller: controller,
@@ -191,97 +160,73 @@ class ServicesSection extends StatelessWidget {
     required IconData icon,
     required String title,
     required String description,
-    required List<String> features,
     required int delay,
     required double width,
     required HomeController controller,
   }) {
     return HoverCard(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () =>
-              controller.scrollToSection(controller.contactKey, "Contact Us"),
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            width: width,
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: AppColors.cardBlack.withValues(alpha: 0.5),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => controller.scrollToSection(
+                controller.contactKey,
+                "Contact Us",
+              ),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
-                width: 1.5,
+              child: Container(
+                width: width,
+                constraints: const BoxConstraints(minHeight: 320),
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: AppColors.cardBlack.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryOrange.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: AppColors.primaryOrange,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        color: AppColors.textWhite,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      description,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFFF9F9F9).withValues(alpha: 0.6),
+                        fontSize: 14,
+                        height: 1.6,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryOrange.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: AppColors.primaryOrange, size: 24),
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    color: AppColors.textWhite,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  description,
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFFF9F9F9).withValues(alpha: 0.6),
-                    fontSize: 14,
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                ...features
-                    .map(
-                      (feature) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: const BoxDecoration(
-                                color: AppColors.primaryOrange,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                feature,
-                                style: GoogleFonts.inter(
-                                  color: const Color(0xFFF9F9F9).withValues(alpha: 0.6),
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ],
-            ),
           ),
-        ),
-      ),
-    )
+        )
         .animate()
         .fadeIn(duration: 800.ms, delay: delay.ms)
         .slideY(begin: 0.1, end: 0);
@@ -303,9 +248,7 @@ class ServicesSection extends StatelessWidget {
             children: [
               TextSpan(
                 text: "The Execution ",
-                style: TextStyle(
-                  color: AppColors.textWhite,
-                ),
+                style: TextStyle(color: AppColors.textWhite),
               ),
               const TextSpan(
                 text: "Blueprint",
@@ -333,5 +276,4 @@ class ServicesSection extends StatelessWidget {
       ],
     );
   }
-
 }

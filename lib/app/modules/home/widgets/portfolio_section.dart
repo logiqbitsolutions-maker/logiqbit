@@ -1,8 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import '../../../../core/values/app_colors.dart';
+import '../../../data/models/project_model.dart';
+import '../../../data/project_data.dart';
 import '../controllers/home_controller.dart';
 import 'about_section.dart'; // For MaxWidthContainer
 import 'hover_card.dart';
@@ -17,13 +20,14 @@ class PortfolioSection extends StatefulWidget {
 class _PortfolioSectionState extends State<PortfolioSection> {
   String _selectedCategory = 'Apps';
   final ScrollController _scrollController = ScrollController();
-  int _currentIndex = 1;
-  double _lastCardWidth = 600;
-
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    setState(() {}); // Force rebuild for indicator
   }
 
   @override
@@ -33,41 +37,10 @@ class _PortfolioSectionState extends State<PortfolioSection> {
     super.dispose();
   }
 
-  void _onScroll() {
-    if (!_scrollController.hasClients) return;
-    double cardWidthWithSpacing = _lastCardWidth + 24;
-    int newIndex =
-        ((_scrollController.offset / cardWidthWithSpacing).round() + 1);
-
-    // Ensure index is within bounds
-    int totalItems = _selectedCategory == 'Apps' ? _apps.length : _games.length;
-    newIndex = newIndex.clamp(1, totalItems);
-
-    if (newIndex != _currentIndex) {
-      setState(() {
-        _currentIndex = newIndex;
-      });
-    }
-  }
-
-  void _scroll(bool forward) {
-    if (!_scrollController.hasClients) return;
-    double cardWidthWithSpacing = _lastCardWidth + 24;
-    final double target =
-        _scrollController.offset +
-        (forward ? cardWidthWithSpacing : -cardWidthWithSpacing);
-    _scrollController.animateTo(
-      target.clamp(0, _scrollController.position.maxScrollExtent),
-      duration: const Duration(milliseconds: 700),
-      curve: Curves.easeOutQuart,
-    );
-  }
-
   void _setCategory(String category) {
     if (_selectedCategory == category) return;
     setState(() {
       _selectedCategory = category;
-      _currentIndex = 1;
     });
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -78,150 +51,15 @@ class _PortfolioSectionState extends State<PortfolioSection> {
     }
   }
 
-  // Dummy Data for Apps
-  final List<Map<String, dynamic>> _apps = [
-    {
-      "category": "FINTECH SOLUTION",
-      "title": "FinFlow Enterprise",
-      "description":
-          "A robust financial ecosystem for multi-national corporations. Secure, scalable, and featuring real-time global ledger synchronization.",
-      "tags": ["FinOps", "Blockchain", "AI Insights"],
-      "imageBgColor": const Color(0xFFF6F8FA),
-      "imageUrl":
-          "https://images.unsplash.com/photo-1563986768494-4dee2763ff0f?auto=format&fit=crop&q=80&w=800",
-      "images": [
-        "https://images.unsplash.com/photo-1563986768494-4dee2763ff0f?auto=format&fit=crop&q=80&w=800",
-        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800",
-      ],
-      "icon": Icons.account_balance_wallet,
-    },
-    {
-      "category": "SUSTAINABILITY TECH",
-      "title": "EcoTrack Systems",
-      "description":
-          "Intelligent carbon footprint monitoring for industrial logistics. Optimizing supply chains for a greener, more sustainable future.",
-      "tags": ["IoT Integration", "Big Data", "SaaS"],
-      "imageBgColor": const Color(0xFF65AEA9),
-      "imageUrl":
-          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
-      "images": [
-        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800",
-      ],
-      "icon": Icons.eco,
-    },
-    {
-      "category": "HEALTHCARE AI",
-      "title": "MediScan Pro",
-      "description":
-          "Next-generation diagnostic tool using advanced AI to analyze medical imagery with unprecedented accuracy and speed.",
-      "tags": ["ML", "Diagnostics", "Big Data"],
-      "imageBgColor": const Color(0xFFE8F4FD),
-      "imageUrl":
-          "https://images.unsplash.com/photo-1576091160550-217359f42f8c?auto=format&fit=crop&q=80&w=800",
-      "images": [
-        "https://images.unsplash.com/photo-1576091160550-217359f42f8c?auto=format&fit=crop&q=80&w=800",
-      ],
-      "icon": Icons.medical_services,
-    },
-    {
-      "category": "EDTECH SOLUTION",
-      "title": "EduLearn Interactive",
-      "description":
-          "A gamified learning platform for schools, providing personalized learning paths for K-12 students.",
-      "tags": ["Interactive", "Gamification", "LMS"],
-      "imageBgColor": const Color(0xFFFFF4E6),
-      "imageUrl":
-          "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=800",
-      "images": [
-        "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=800",
-      ],
-      "icon": Icons.school,
-    },
-    {
-      "category": "LOGISTICS OPTIMIZER",
-      "title": "RouteMaster AI",
-      "description":
-          "Dynamic route optimization for fleet management, reducing fuel consumption and improving delivery times.",
-      "tags": ["AI", "GIS", "Fleet"],
-      "imageBgColor": const Color(0xFFF1F0F0),
-      "imageUrl":
-          "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800",
-      "images": [
-        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800",
-      ],
-      "icon": Icons.local_shipping,
-    },
-  ];
-
-  // Dummy Data for Games
-  final List<Map<String, dynamic>> _games = [
-    {
-      "category": "ACTION RPG",
-      "title": "Neon Genesis",
-      "description":
-          "A fast-paced cyberpunk action RPG with deep narrative choices and next-gen graphics powered by Unreal Engine 5.",
-      "tags": ["RPG", "Cyberpunk", "Multiplayer"],
-      "imageBgColor": const Color(0xFF1E1E2C),
-      "imageUrl":
-          "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=800",
-      "images": [
-        "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=800",
-        "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=800",
-      ],
-      "icon": Icons.gamepad,
-    },
-    {
-      "category": "PUZZLE ADVENTURE",
-      "title": "Logic Realms",
-      "description":
-          "Mind-bending puzzles set in a surreal dreamscape. Challenge your intellect with physics-based environmental riddles.",
-      "tags": ["Puzzle", "Indie", "Brain Teaser"],
-      "imageBgColor": const Color(0xFFE8D5CA),
-      "imageUrl":
-          "https://images.unsplash.com/photo-1614294149010-950b698f72c0?auto=format&fit=crop&q=80&w=800",
-      "images": [
-        "https://images.unsplash.com/photo-1614294149010-950b698f72c0?auto=format&fit=crop&q=80&w=800",
-      ],
-      "icon": Icons.extension,
-    },
-    {
-      "category": "STRATEGY SIM",
-      "title": "Urban Architect",
-      "description":
-          "Build and manage a sustainable city of the future, balancing ecology, economy, and citizen happiness.",
-      "tags": ["Strategy", "Simulation", "City Builder"],
-      "imageBgColor": const Color(0xFF2D3436),
-      "imageUrl":
-          "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800",
-      "images": [
-        "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800",
-      ],
-      "icon": Icons.location_city,
-    },
-    {
-      "category": "SPACE EXPLORATION",
-      "title": "Star Voyager",
-      "description":
-          "Embark on an epic journey across the galaxy, discovering new worlds and uncovering ancient alien secrets.",
-      "tags": ["Sci-Fi", "Exploration", "Open World"],
-      "imageBgColor": const Color(0xFF0F172A),
-      "imageUrl":
-          "https://images.unsplash.com/photo-1614728263952-84ea206f99b6?auto=format&fit=crop&q=80&w=800",
-      "images": [
-        "https://images.unsplash.com/photo-1614728263952-84ea206f99b6?auto=format&fit=crop&q=80&w=800",
-      ],
-      "icon": Icons.rocket_launch,
-    },
-  ];
+  // Data sourced from project_data.dart
+  final List<ProjectModel> _apps = ProjectData.apps;
+  final List<ProjectModel> _games = ProjectData.games;
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
-    List<Map<String, dynamic>> currentData = _selectedCategory == 'Apps'
-        ? _apps
-        : _games;
+    List<ProjectModel> currentData =
+        _selectedCategory == 'Apps' ? _apps : _games;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -256,30 +94,20 @@ class _PortfolioSectionState extends State<PortfolioSection> {
                   ),
                 SizedBox(height: isMobile ? 40 : 60),
 
-                // Portfolio Layout using Horizontal Scroll back
-                SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Row(
+                // Portfolio Layout
+                if (isMobile)
+                  Center(
+                    child: Column(
                       children: currentData.asMap().entries.map((entry) {
                         int idx = entry.key;
                         var data = entry.value;
 
-                        double cardWidth = constraints.maxWidth;
-                        if (constraints.maxWidth > 900) {
-                          cardWidth = (1200 - 48) / 3; // 3 columns
-                        } else if (constraints.maxWidth > 600) {
-                          cardWidth = constraints.maxWidth * 0.7; // Tablet
-                        }
-
-                        _lastCardWidth = cardWidth;
+                        // Mobile card width: smaller and centered
+                        double cardWidth = (constraints.maxWidth - 48) * 0.9;
 
                         return Container(
                           width: cardWidth,
-                          margin: const EdgeInsets.only(right: 24),
+                          margin: const EdgeInsets.only(bottom: 24),
                           child: PortfolioCard(
                             data: data,
                             delay: idx * 100,
@@ -288,24 +116,114 @@ class _PortfolioSectionState extends State<PortfolioSection> {
                         );
                       }).toList(),
                     ),
+                  )
+                else
+                  ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black,
+                          Colors.black,
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.05, 0.95, 1.0],
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.dstIn,
+                    child: ScrollConfiguration(
+                      behavior: const MaterialScrollBehavior().copyWith(
+                        dragDevices: {
+                          PointerDeviceKind.mouse,
+                          PointerDeviceKind.touch,
+                          PointerDeviceKind.trackpad,
+                          PointerDeviceKind.stylus,
+                        },
+                      ),
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                          child: Row(
+                            children: currentData.asMap().entries.map((entry) {
+                              int idx = entry.key;
+                              var data = entry.value;
+
+                              double cardWidth = constraints.maxWidth;
+                              if (constraints.maxWidth > 900) {
+                                cardWidth = (1200 - 48) / 3.3; // Allow next card to peek
+                              } else if (constraints.maxWidth > 600) {
+                                cardWidth = constraints.maxWidth * 0.75; // Tablet peek
+                              }
+
+                              return Container(
+                                width: cardWidth,
+                                margin: const EdgeInsets.only(right: 24),
+                                child: PortfolioCard(
+                                  data: data,
+                                  delay: idx * 100,
+                                  controller: controller,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 50),
-                // Navigation Indicator and Buttons (Aligned to the Right)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    _PortfolioNavButton(
-                      icon: Icons.arrow_back_ios_new_rounded,
-                      onTap: () => _scroll(false),
+
+                if (!isMobile)
+                  // Horizontal Scroll Progress Indicator
+                  Padding(
+                    padding: const EdgeInsets.only(top: 24),
+                    child: Center(
+                      child: Container(
+                        width: 200,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            double progress = 0;
+                            if (_scrollController.hasClients &&
+                                _scrollController.position.maxScrollExtent >
+                                    0) {
+                              progress = (_scrollController.offset /
+                                      _scrollController
+                                          .position.maxScrollExtent)
+                                  .clamp(0.0, 1.0);
+                            }
+                            return Stack(
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 100),
+                                  width: constraints.maxWidth * progress,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryOrange,
+                                    borderRadius: BorderRadius.circular(2),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primaryOrange
+                                            .withValues(alpha: 0.3),
+                                        blurRadius: 10,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 16),
-                    _PortfolioNavButton(
-                      icon: Icons.arrow_forward_ios_rounded,
-                      onTap: () => _scroll(true),
-                    ),
-                  ],
-                ),
+                  ),
               ],
             ),
           ),
@@ -470,7 +388,7 @@ class _TabButton extends StatelessWidget {
             title,
             style: GoogleFonts.inter(
               color: isSelected
-                  ? AppColors.backgroundBlack
+                  ? Colors.white
                   : AppColors.textLightGrey,
               fontWeight: FontWeight.w700,
               fontSize: 14,
@@ -483,7 +401,7 @@ class _TabButton extends StatelessWidget {
 }
 
 class PortfolioCard extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final ProjectModel data;
   final int delay;
   final HomeController controller;
 
@@ -502,7 +420,7 @@ class PortfolioCard extends StatelessWidget {
               color: const Color(
                 0xFF0D0D0D,
               ), // Deeper dark background to match reference
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
               boxShadow: [
                 BoxShadow(
@@ -513,7 +431,7 @@ class PortfolioCard extends StatelessWidget {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(16),
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   bool isMobile = constraints.maxWidth < 600;
@@ -523,7 +441,7 @@ class PortfolioCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       AspectRatio(
-                        aspectRatio: 1.5,
+                        aspectRatio: isMobile ? 1.8 : 1.5,
                         child: _buildImageSection(context, isStacked: true),
                       ),
                       _buildContentSection(context, isMobile: isMobile),
@@ -549,29 +467,39 @@ class PortfolioCard extends StatelessWidget {
   Widget _buildImageSection(BuildContext context, {required bool isStacked}) {
     return Container(
       width: double.infinity,
-      color: data['imageBgColor'],
+      color: data.imageBgColor,
       child: ClipRRect(
-        child: Image.network(
-          data['imageUrl'],
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: const Color(0xFF1A1A1A),
-              child: const Icon(
-                Icons.image_not_supported_outlined,
-                color: Colors.white24,
-                size: 30,
+        child: data.imageUrl.startsWith('assets/')
+            ? Image.asset(
+                data.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildErrorPlaceholder(),
+              )
+            : Image.network(
+                data.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildErrorPlaceholder(),
               ),
-            );
-          },
-        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorPlaceholder() {
+    return Container(
+      color: const Color(0xFF1A1A1A),
+      child: const Icon(
+        Icons.image_not_supported_outlined,
+        color: Colors.white24,
+        size: 30,
       ),
     );
   }
 
   Widget _buildContentSection(BuildContext context, {required bool isMobile}) {
     return Padding(
-      padding: EdgeInsets.all(isMobile ? 24.0 : 28.0),
+      padding: EdgeInsets.all(isMobile ? 20.0 : 32.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -588,7 +516,7 @@ class PortfolioCard extends StatelessWidget {
                   ),
                 ),
                 child: Icon(
-                  data['icon'],
+                  data.icon,
                   color: AppColors.primaryOrange,
                   size: 18,
                 ),
@@ -596,7 +524,7 @@ class PortfolioCard extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  data['category'],
+                  data.category,
                   style: GoogleFonts.inter(
                     color: AppColors.primaryOrange,
                     fontSize: 13,
@@ -607,26 +535,26 @@ class PortfolioCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: isMobile ? 20 : 32),
           Text(
-            data['title'],
+            data.title,
             style: GoogleFonts.inter(
               color: AppColors.textWhite,
-              fontSize: 28, // Larger title
+              fontSize: isMobile ? 18 : 22,
               fontWeight: FontWeight.w800,
               letterSpacing: -0.8,
               height: 1.1,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: isMobile ? 16 : 24),
           Wrap(
             spacing: 12,
             runSpacing: 10,
-            children: (data['tags'] as List<String>).map((tag) {
+            children: (data.tags).map((tag) {
               return Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
+                  horizontal: 10,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1A1A1A), // Darker pill bg
@@ -639,14 +567,14 @@ class PortfolioCard extends StatelessWidget {
                   tag,
                   style: GoogleFonts.inter(
                     color: Colors.white70,
-                    fontSize: 12,
+                    fontSize: isMobile ? 9 : 10,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               );
             }).toList(),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: isMobile ? 24 : 40),
           InkWell(
             onTap: () => _showProjectDetails(context, data),
             borderRadius: BorderRadius.circular(12),
@@ -691,7 +619,7 @@ class PortfolioCard extends StatelessWidget {
   }
 }
 
-void _showProjectDetails(BuildContext context, Map<String, dynamic> data) {
+void _showProjectDetails(BuildContext context, ProjectModel data) {
   showDialog(
     context: context,
     builder: (context) => ProjectDetailsDialog(data: data),
@@ -699,146 +627,372 @@ void _showProjectDetails(BuildContext context, Map<String, dynamic> data) {
 }
 
 class ProjectDetailsDialog extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final ProjectModel data;
 
   const ProjectDetailsDialog({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final List<String> images = data['images'] ?? [data['imageUrl']];
+    final bool isDesktop = MediaQuery.of(context).size.width >= 1000;
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 900),
-        decoration: BoxDecoration(
-          color: const Color(0xFF110D0B),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 600),
+        tween: Tween(begin: 0.0, end: 1.0),
+        curve: Curves.easeOutQuart,
+        builder: (context, value, child) {
+          return Transform.scale(
+            scale: 0.95 + (0.05 * value),
+            child: Opacity(
+              opacity: value,
+              child: child,
+            ),
+          );
+        },
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 1200,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A0705),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.8),
+                blurRadius: 40,
+                spreadRadius: -10,
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: isDesktop ? _buildDesktopLayout(context) : _buildMobileLayout(context),
+          ),
         ),
-        child: SingleChildScrollView(
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Left Side: Content (Fixed/Scrollable scroll)
+        Expanded(
+          flex: 4,
+          child: Container(
+            padding: const EdgeInsets.all(48),
+            decoration: BoxDecoration(
+              border: Border(right: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                const SizedBox(height: 60),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildProjectMeta(),
+                        const SizedBox(height: 48),
+                        _buildDescription(),
+                        const SizedBox(height: 48),
+                        _buildTechStack(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Right Side: Showcase (Big Gallery)
+        Expanded(
+          flex: 6,
+          child: Container(
+            color: Colors.black.withValues(alpha: 0.2),
+            child: _buildGallery(isDesktop: true),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: _buildHeader(context),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: _buildProjectMeta(),
+          ),
+          const SizedBox(height: 32),
+          SizedBox(
+            height: 380, // Fixed height for mobile gallery
+            child: _buildGallery(isDesktop: false),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDescription(),
+                const SizedBox(height: 32),
+                _buildTechStack(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with Close Button
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.white70),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: 0.05),
-                      ),
-                    ),
-                  ],
+              Text(
+                data.category.toUpperCase(),
+                style: GoogleFonts.inter(
+                  color: AppColors.primaryOrange,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2.0,
                 ),
               ),
-
-              // Image Gallery
-              SizedBox(
-                height: 400,
-                child: PageView.builder(
-                  itemCount: images.length,
-                  controller: PageController(viewportFraction: 0.85),
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.network(
-                          images[index],
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: const Color(0xFF1A1A1A),
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: const Icon(
-                                Icons.image_not_supported_outlined,
-                                color: Colors.white24,
-                                size: 50,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              // Project Info
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data['title'],
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      data['category'],
-                      style: GoogleFonts.inter(
-                        color: AppColors.primaryOrange,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      data['description'],
-                      style: GoogleFonts.inter(
-                        color: Colors.white70,
-                        fontSize: 16,
-                        height: 1.6,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: (data['tags'] as List<String>).map((tag) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.1),
-                            ),
-                          ),
-                          child: Text(
-                            tag,
-                            style: GoogleFonts.inter(
-                              color: Colors.white54,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+              const SizedBox(height: 8),
+              Text(
+                data.title,
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 40,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
                 ),
               ),
             ],
           ),
         ),
+        IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.close_rounded, color: Colors.white, size: 24),
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.white.withValues(alpha: 0.1),
+            padding: const EdgeInsets.all(12),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProjectMeta() {
+    return Row(
+      children: [
+        _metaItem("PLATFORM", "Mobile App"),
+        const SizedBox(width: 40),
+        _metaItem("YEAR", "2024"),
+        const SizedBox(width: 40),
+        _metaItem("STATUS", "Completed"),
+      ],
+    );
+  }
+
+  Widget _metaItem(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            color: Colors.white38,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: GoogleFonts.inter(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDescription() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "OVERVIEW",
+          style: GoogleFonts.inter(
+            color: Colors.white38,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          data.description,
+          style: GoogleFonts.inter(
+            color: Colors.white70,
+            fontSize: 16,
+            height: 1.8,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTechStack() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "TECH STACK",
+          style: GoogleFonts.inter(
+            color: Colors.white38,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: data.tags.map((tag) => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(100),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            ),
+            child: Text(
+              tag,
+              style: GoogleFonts.inter(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          )).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGallery({required bool isDesktop}) {
+    return ScrollConfiguration(
+      behavior: const MaterialScrollBehavior().copyWith(
+        dragDevices: {
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.touch,
+          PointerDeviceKind.trackpad,
+          PointerDeviceKind.stylus,
+        },
+      ),
+      child: ListView.separated(
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 48 : 24,
+          vertical: isDesktop ? 60 : 20,
+        ),
+        scrollDirection: Axis.horizontal,
+        itemCount: data.images.length,
+        separatorBuilder: (context, index) => SizedBox(width: isDesktop ? 40 : 20),
+        itemBuilder: (context, index) {
+          return HoverScaleWidget(
+            child: Container(
+              width: isDesktop ? 340 : 260,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    blurRadius: 30,
+                    spreadRadius: -5,
+                    offset: const Offset(0, 15),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: data.images[index].startsWith('assets/')
+                    ? Image.asset(
+                        data.images[index],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            _buildErrorPlaceholder(),
+                      )
+                    : Image.network(
+                        data.images[index],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            _buildErrorPlaceholder(),
+                      ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+  Widget _buildErrorPlaceholder() {
+    return Container(
+      color: const Color(0xFF1A1A1A),
+      width: double.infinity,
+      height: double.infinity,
+      child: const Icon(
+        Icons.image_not_supported_outlined,
+        color: Colors.white24,
+        size: 50,
+      ),
+    );
+  }
+}
+
+class HoverScaleWidget extends StatefulWidget {
+  final Widget child;
+  const HoverScaleWidget({super.key, required this.child});
+
+  @override
+  State<HoverScaleWidget> createState() => _HoverScaleWidgetState();
+}
+
+class _HoverScaleWidgetState extends State<HoverScaleWidget> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
+        child: widget.child,
       ),
     );
   }

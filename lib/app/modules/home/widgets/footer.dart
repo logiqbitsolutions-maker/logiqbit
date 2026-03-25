@@ -29,8 +29,8 @@ class Footer extends StatelessWidget {
                         Expanded(flex: 3, child: _buildBrandDescription()),
                         const SizedBox(width: 40),
                         Expanded(flex: 2, child: _buildColumn("Company", ["About", "Career", "Contact", "Privacy Policy", "Terms of Service"])),
-                        Expanded(flex: 3, child: _buildColumn("Services", ["Artificial Intelligence", "Web Development", "Mobile Development", "Cloud Solutions", "UI/UX Design", "DevOps & Automation", "Digital Marketing & SEO"])),
-                        Expanded(flex: 3, child: _buildColumn("Technologies", ["Frontend", "Backend", "Mobile", "Database", "Cloud & DevOps", "UI/UX", "Digital Marketing & SEO"])),
+                        Expanded(flex: 3, child: _buildColumn("Services", ["Artificial Intelligence", "Web Development", "Mobile Development", "Game Development", "UI/UX Design", "Testing / QA"])),
+                        Expanded(flex: 3, child: _buildColumn("Technologies", ["Frontend", "Backend", "Mobile", "Database", "Cloud & DevOps", "UI/UX"])),
                       ],
                     );
                   }
@@ -44,11 +44,11 @@ class Footer extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(child: _buildColumn("Company", ["About", "Career", "Contact", "Privacy Policy", "Terms of Service"], isMobile: true)),
-                          Expanded(child: _buildColumn("Services", ["Artificial Intelligence", "Web Development", "Mobile Development", "Cloud Solutions", "UI/UX Design", "DevOps & Automation", "Digital Marketing & SEO"], isMobile: true)),
+                          Expanded(child: _buildColumn("Services", ["Artificial Intelligence", "Web Development", "Mobile Development", "Game Development", "UI/UX Design", "Testing / QA"], isMobile: true)),
                         ],
                       ),
                       const SizedBox(height: 48),
-                      _buildColumn("Technologies", ["Frontend", "Backend", "Mobile", "Database", "Cloud & DevOps", "UI/UX", "Digital Marketing & SEO"], isMobile: true),
+                      _buildColumn("Technologies", ["Frontend", "Backend", "Mobile", "Database", "Cloud & DevOps", "UI/UX"], isMobile: true),
                     ],
                   );
                 },
@@ -186,17 +186,12 @@ class Footer extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         if (title == "Technologies" && isMobile)
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 4,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-            ),
-            itemCount: links.length,
-            itemBuilder: (context, index) => _buildLink(links[index]),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: links.map((link) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildLink(link),
+            )).toList(),
           )
         else
           ...links.map((link) => Padding(

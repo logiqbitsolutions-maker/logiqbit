@@ -105,19 +105,19 @@ class WhyUsSection extends StatelessWidget {
         final isTablet =
             constraints.maxWidth >= 600 && constraints.maxWidth < 1000;
 
-        int crossAxisCount = 4;
-        if (isMobile)
-          crossAxisCount = 1;
-        else if (isTablet)
-          crossAxisCount = 2;
+        double spacing = 24;
+        double width;
+        if (isMobile) {
+          width = constraints.maxWidth;
+        } else if (isTablet) {
+          width = (constraints.maxWidth - spacing) / 2;
+        } else {
+          width = (constraints.maxWidth - (spacing * 3)) / 4;
+        }
 
-        return GridView.count(
-          crossAxisCount: crossAxisCount,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 24,
-          crossAxisSpacing: 24,
-          childAspectRatio: isMobile ? 1.4 : 0.85,
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
           children: [
             _buildFeatureCard(
               icon: Icons.lightbulb_outline_rounded,
@@ -126,6 +126,7 @@ class WhyUsSection extends StatelessWidget {
                   "We leverage the latest AI and cloud architectures to ensure your business stays ahead of the competition.",
               delay: 0,
               isMobile: isMobile,
+              width: width,
             ),
             _buildFeatureCard(
               icon: Icons.auto_graph_rounded,
@@ -134,6 +135,7 @@ class WhyUsSection extends StatelessWidget {
                   "Our modular systems are designed to expand seamlessly as your user base and data requirements grow.",
               delay: 100,
               isMobile: isMobile,
+              width: width,
             ),
             _buildFeatureCard(
               icon: Icons.groups_rounded,
@@ -142,6 +144,7 @@ class WhyUsSection extends StatelessWidget {
                   "Access a pool of world-class developers and consultants with deep domain expertise in your industry.",
               delay: 200,
               isMobile: isMobile,
+              width: width,
             ),
             _buildFeatureCard(
               icon: Icons.support_agent_rounded,
@@ -150,6 +153,7 @@ class WhyUsSection extends StatelessWidget {
                   "Global monitoring systems and a dedicated response team ready to assist you at any hour.",
               delay: 300,
               isMobile: isMobile,
+              width: width,
             ),
           ],
         );
@@ -163,10 +167,11 @@ class WhyUsSection extends StatelessWidget {
     required String description,
     required int delay,
     required bool isMobile,
+    required double width,
   }) {
     return HoverCard(
           child: Container(
-            height: double.infinity,
+            width: width,
             padding: EdgeInsets.all(isMobile ? 24 : 32),
             decoration: BoxDecoration(
               color: AppColors.cardBlack.withValues(alpha: 0.5),

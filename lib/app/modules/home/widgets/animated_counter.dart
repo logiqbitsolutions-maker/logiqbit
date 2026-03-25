@@ -5,6 +5,7 @@ class AnimatedCounter extends StatefulWidget {
   final num targetValue;
   final String suffix;
   final String prefix;
+  final bool formatK;
   final Duration duration;
   final TextStyle style;
   final Curve curve;
@@ -14,6 +15,7 @@ class AnimatedCounter extends StatefulWidget {
     required this.targetValue,
     this.suffix = "",
     this.prefix = "",
+    this.formatK = false,
     this.duration = const Duration(milliseconds: 1500),
     required this.style,
     this.curve = Curves.easeOutQuart,
@@ -65,9 +67,13 @@ class _AnimatedCounterState extends State<AnimatedCounter>
         animation: _animation,
         builder: (context, child) {
           String displayValue;
-          if (widget.targetValue is int) {
+          if (widget.formatK && _animation.value >= 1000) {
+            displayValue = "${(_animation.value / 1000).toInt()}K";
+          } else if (widget.targetValue is int) {
+            // Ensure integers don't show decimals during count
             displayValue = _animation.value.toInt().toString();
           } else {
+            // Support one decimal for things like ratings (5.0)
             displayValue = _animation.value.toStringAsFixed(1);
           }
 
