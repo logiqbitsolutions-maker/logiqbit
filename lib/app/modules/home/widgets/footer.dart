@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/values/app_colors.dart';
 import 'about_section.dart'; // For MaxWidthContainer
 import 'navbar.dart'; // For LogoWidget
@@ -28,9 +29,38 @@ class Footer extends StatelessWidget {
                       children: [
                         Expanded(flex: 3, child: _buildBrandDescription()),
                         const SizedBox(width: 40),
-                        Expanded(flex: 2, child: _buildColumn("Company", ["About", "Career", "Contact", "Privacy Policy", "Terms of Service"])),
-                        Expanded(flex: 3, child: _buildColumn("Services", ["Artificial Intelligence", "Web Development", "Mobile Development", "Game Development", "UI/UX Design", "Testing / QA"])),
-                        Expanded(flex: 3, child: _buildColumn("Technologies", ["Frontend", "Backend", "Mobile", "Database", "Cloud & DevOps", "UI/UX"])),
+                        Expanded(
+                          flex: 2,
+                          child: _buildColumn("Company", [
+                            "About",
+                            "Career",
+                            "Contact",
+                            "Privacy Policy",
+                            "Terms of Service",
+                          ]),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: _buildColumn("Services", [
+                            "Artificial Intelligence",
+                            "Web Development",
+                            "Mobile Development",
+                            "Game Development",
+                            "UI/UX Design",
+                            "Testing / QA",
+                          ]),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: _buildColumn("Technologies", [
+                            "Frontend",
+                            "Backend",
+                            "Mobile",
+                            "Database",
+                            "Cloud & DevOps",
+                            "UI/UX",
+                          ]),
+                        ),
                       ],
                     );
                   }
@@ -43,12 +73,36 @@ class Footer extends StatelessWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: _buildColumn("Company", ["About", "Career", "Contact", "Privacy Policy", "Terms of Service"], isMobile: true)),
-                          Expanded(child: _buildColumn("Services", ["Artificial Intelligence", "Web Development", "Mobile Development", "Game Development", "UI/UX Design", "Testing / QA"], isMobile: true)),
+                          Expanded(
+                            child: _buildColumn("Company", [
+                              "About",
+                              "Career",
+                              "Contact",
+                              "Privacy Policy",
+                              "Terms of Service",
+                            ], isMobile: true),
+                          ),
+                          Expanded(
+                            child: _buildColumn("Services", [
+                              "Artificial Intelligence",
+                              "Web Development",
+                              "Mobile Development",
+                              "Game Development",
+                              "UI/UX Design",
+                              "Testing / QA",
+                            ], isMobile: true),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 48),
-                      _buildColumn("Technologies", ["Frontend", "Backend", "Mobile", "Database", "Cloud & DevOps", "UI/UX"], isMobile: true),
+                      _buildColumn("Technologies", [
+                        "Frontend",
+                        "Backend",
+                        "Mobile",
+                        "Database",
+                        "Cloud & DevOps",
+                        "UI/UX",
+                      ], isMobile: true),
                     ],
                   );
                 },
@@ -57,17 +111,14 @@ class Footer extends StatelessWidget {
           ),
 
           // Bottom Bar
-          Container(
-            height: 1,
-            color: Colors.white.withValues(alpha: 0.05),
-          ),
+          Container(height: 1, color: Colors.white.withValues(alpha: 0.05)),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
             child: MaxWidthContainer(
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final isMobile = constraints.maxWidth < 600;
-                  
+
                   final copyright = Text(
                     "© 2026 Logiqbit Solutions. All rights reserved.",
                     style: GoogleFonts.inter(
@@ -79,13 +130,21 @@ class Footer extends StatelessWidget {
                   final socialIcons = Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _socialIcon(Icons.work_rounded), // LinkedIn
+                      _socialAssetIcon(
+                        'assets/linkedin.png',
+                        url:
+                            'https://www.linkedin.com/company/logiqbit-solutions/posts/?feedView=all',
+                      ),
                       const SizedBox(width: 12),
-                      _socialIcon(Icons.camera_alt_outlined), // Instagram
+                      _socialAssetIcon(
+                        'assets/instagram.png',
+                        url:
+                            'https://www.instagram.com/logiqbitsolutions?igsh=dmgyYW4xcDEzdXY0',
+                      ),
                       const SizedBox(width: 12),
-                      _socialIcon(Icons.facebook_rounded),
+                      _socialAssetIcon('assets/facebook.png'),
                       const SizedBox(width: 12),
-                      _socialIcon(Icons.close_rounded), // X (Twitter)
+                      _socialAssetIcon('assets/twitter.png'),
                     ],
                   );
 
@@ -148,7 +207,7 @@ class Footer extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 32),
-        _contactItem(Icons.email_outlined, "contact@logiqbit.com"),
+        _contactItem(Icons.email_outlined, "logiqbitsolution@gmail.com"),
       ],
     );
   }
@@ -162,17 +221,18 @@ class Footer extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: GoogleFonts.inter(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
+            style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildColumn(String title, List<String> links, {bool isMobile = false}) {
+  Widget _buildColumn(
+    String title,
+    List<String> links, {
+    bool isMobile = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -188,16 +248,22 @@ class Footer extends StatelessWidget {
         if (title == "Technologies" && isMobile)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: links.map((link) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _buildLink(link),
-            )).toList(),
+            children: links
+                .map(
+                  (link) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _buildLink(link),
+                  ),
+                )
+                .toList(),
           )
         else
-          ...links.map((link) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _buildLink(link),
-          )),
+          ...links.map(
+            (link) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildLink(link),
+            ),
+          ),
       ],
     );
   }
@@ -207,26 +273,39 @@ class Footer extends StatelessWidget {
       onTap: () {},
       child: Text(
         link,
-        style: GoogleFonts.inter(
-          color: Colors.white54,
-          fontSize: 15,
-        ),
+        style: GoogleFonts.inter(color: Colors.white54, fontSize: 15),
       ),
     );
   }
 
   // Remove _buildTechnologiesColumn as it is no longer used.
 
-  Widget _socialIcon(IconData icon) {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+  Widget _socialAssetIcon(String assetPath, {String? url}) {
+    return InkWell(
+      onTap: () async {
+        if (url != null) {
+          final uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri);
+          }
+        }
+      },
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        width: 44,
+        height: 44,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Image.asset(
+          assetPath,
+          // color: Colors.white70,
+          fit: BoxFit.contain,
+        ),
       ),
-      child: Icon(icon, color: Colors.white70, size: 18),
     );
   }
 }

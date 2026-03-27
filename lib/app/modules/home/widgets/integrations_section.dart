@@ -193,17 +193,19 @@ class _IntelligentCoreSystemState extends State<_IntelligentCoreSystem>
 
           // Connection Paths & Particles
           Positioned.fill(
-            child: AnimatedBuilder(
-              animation: _pulseController,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: _CoreLinkPainter(
-                    pulseValue: _pulseController.value,
-                    nodeAngles: nodes.map((n) => n.angle).toList(),
-                    isMobile: isMobile,
-                  ),
-                );
-              },
+            child: RepaintBoundary(
+              child: AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: _CoreLinkPainter(
+                      pulseValue: _pulseController.value,
+                      nodeAngles: nodes.map((n) => n.angle).toList(),
+                      isMobile: isMobile,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
 
@@ -269,7 +271,8 @@ class _IntelligentCoreSystemState extends State<_IntelligentCoreSystem>
   }
 
   Widget _buildCentralHub(double size) {
-    return Container(
+    return RepaintBoundary(
+      child: Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
@@ -337,7 +340,7 @@ class _IntelligentCoreSystemState extends State<_IntelligentCoreSystem>
               .rotate(duration: const Duration(seconds: 10)),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildNodePositioned(
@@ -485,6 +488,12 @@ class _CoreLinkPainter extends CustomPainter {
   final List<double> nodeAngles;
   final bool isMobile;
 
+  // High-performance CPU caches to avoid building DOM metrics inside 60fps paint loop
+  static Size? _lastSize;
+  static late List<Path> _cachedPaths;
+  static late List<List<PathMetric>> _cachedMetrics;
+  static late List<Rect> _cachedRects;
+
   _CoreLinkPainter({
     required this.pulseValue,
     required this.nodeAngles,
@@ -493,44 +502,54 @@ class _CoreLinkPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
+    if (_lastSize != size) {
+      _lastSize = size;
+      _cachedPaths = [];
+      _cachedMetrics = [];
+      _cachedRects = [];
+      
+      final center = Offset(size.width / 2, size.height / 2);
+      final radius = isMobile ? (size.width * 0.35) : (size.width * 0.28);
+
+      for (var angle in nodeAngles) {
+        final rad = angle * math.pi / 180;
+        final target = Offset(
+          center.dx + radius * math.cos(rad),
+          center.dy - radius * math.sin(rad),
+        );
+
+        final path = Path();
+        path.moveTo(center.dx, center.dy);
+
+        final midAngle = (angle + 10) * math.pi / 180;
+        final control = Offset(
+          center.dx + (radius * 0.5) * math.cos(midAngle),
+          center.dy - (radius * 0.5) * math.sin(midAngle),
+        );
+
+        path.quadraticBezierTo(control.dx, control.dy, target.dx, target.dy);
+        
+        _cachedPaths.add(path);
+        _cachedMetrics.add(path.computeMetrics().toList());
+        _cachedRects.add(Rect.fromPoints(center, target));
+      }
+    }
+
     final linkPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
 
-    final radius = isMobile ? (size.width * 0.35) : (size.width * 0.28);
-
-    for (var angle in nodeAngles) {
-      final rad = angle * math.pi / 180;
-      final target = Offset(
-        center.dx + radius * math.cos(rad),
-        center.dy - radius * math.sin(rad),
-      );
-
-      // Create a curved path
-      final path = Path();
-      path.moveTo(center.dx, center.dy);
-
-      // Control point for curve
-      final midAngle = (angle + 10) * math.pi / 180;
-      final control = Offset(
-        center.dx + (radius * 0.5) * math.cos(midAngle),
-        center.dy - (radius * 0.5) * math.sin(midAngle),
-      );
-
-      path.quadraticBezierTo(control.dx, control.dy, target.dx, target.dy);
-
-      // Draw Base Curve
+    for (int idx = 0; idx < _cachedPaths.length; idx++) {
       linkPaint.shader = LinearGradient(
         colors: [
           AppColors.primaryOrange.withValues(alpha: 0.3),
           AppColors.primaryOrange.withValues(alpha: 0.05),
         ],
-      ).createShader(Rect.fromPoints(center, target));
-      canvas.drawPath(path, linkPaint);
+      ).createShader(_cachedRects[idx]);
+      
+      canvas.drawPath(_cachedPaths[idx], linkPaint);
 
-      // Draw Animated Particles
-      final metrics = path.computeMetrics().toList();
+      final metrics = _cachedMetrics[idx];
       if (metrics.isNotEmpty) {
         final metric = metrics.first;
         final count = 2;

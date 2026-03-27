@@ -5,61 +5,20 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import '../../../../core/values/app_colors.dart';
 import '../../../data/models/project_model.dart';
-import '../../../data/project_data.dart';
 import '../controllers/home_controller.dart';
-import 'about_section.dart'; // For MaxWidthContainer
+import 'about_section.dart';
 import 'hover_card.dart';
 
-class PortfolioSection extends StatefulWidget {
+class PortfolioSection extends StatelessWidget {
   const PortfolioSection({super.key});
-
-  @override
-  State<PortfolioSection> createState() => _PortfolioSectionState();
-}
-
-class _PortfolioSectionState extends State<PortfolioSection> {
-  String _selectedCategory = 'Apps';
-  final ScrollController _scrollController = ScrollController();
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  void _onScroll() {
-    setState(() {}); // Force rebuild for indicator
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _setCategory(String category) {
-    if (_selectedCategory == category) return;
-    setState(() {
-      _selectedCategory = category;
-    });
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        0,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeOutQuart,
-      );
-    }
-  }
-
-  // Data sourced from project_data.dart
-  final List<ProjectModel> _apps = ProjectData.apps;
-  final List<ProjectModel> _games = ProjectData.games;
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
-    List<ProjectModel> currentData =
-        _selectedCategory == 'Apps' ? _apps : _games;
+    return Obx(() {
+      final currentData = controller.portfolioCategory.value == 'Apps'
+          ? controller.portfolioApps
+          : controller.portfolioGames;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -143,11 +102,14 @@ class _PortfolioSectionState extends State<PortfolioSection> {
                         },
                       ),
                       child: SingleChildScrollView(
-                        controller: _scrollController,
+                        controller: controller.portfolioScrollController,
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 20,
+                            horizontal: 40,
+                          ),
                           child: Row(
                             children: currentData.asMap().entries.map((entry) {
                               int idx = entry.key;
@@ -155,9 +117,12 @@ class _PortfolioSectionState extends State<PortfolioSection> {
 
                               double cardWidth = constraints.maxWidth;
                               if (constraints.maxWidth > 900) {
-                                cardWidth = (1200 - 48) / 3.3; // Allow next card to peek
+                                cardWidth =
+                                    (1200 - 48) /
+                                    3.3; // Allow next card to peek
                               } else if (constraints.maxWidth > 600) {
-                                cardWidth = constraints.maxWidth * 0.75; // Tablet peek
+                                cardWidth =
+                                    constraints.maxWidth * 0.75; // Tablet peek
                               }
 
                               return Container(
@@ -191,13 +156,15 @@ class _PortfolioSectionState extends State<PortfolioSection> {
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             double progress = 0;
-                            if (_scrollController.hasClients &&
-                                _scrollController.position.maxScrollExtent >
+                            if (controller.portfolioScrollController.hasClients &&
+                                controller.portfolioScrollController.position.maxScrollExtent >
                                     0) {
-                              progress = (_scrollController.offset /
-                                      _scrollController
-                                          .position.maxScrollExtent)
-                                  .clamp(0.0, 1.0);
+                              progress =
+                                  (controller.portfolioScrollController.offset /
+                                          controller.portfolioScrollController
+                                              .position
+                                              .maxScrollExtent)
+                                      .clamp(0.0, 1.0);
                             }
                             return Stack(
                               children: [
@@ -230,6 +197,8 @@ class _PortfolioSectionState extends State<PortfolioSection> {
         );
       },
     );
+  })
+  ;
   }
 
   Widget _buildTitle(bool isMobile) {
@@ -276,7 +245,8 @@ class _PortfolioSectionState extends State<PortfolioSection> {
   }
 
   Widget _buildTabs() {
-    return Container(
+    final controller = Get.find<HomeController>();
+    return Obx(() => Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: AppColors.surfaceBlack,
@@ -288,17 +258,17 @@ class _PortfolioSectionState extends State<PortfolioSection> {
         children: [
           _TabButton(
             title: "Apps",
-            isSelected: _selectedCategory == 'Apps',
-            onTap: () => _setCategory('Apps'),
+            isSelected: controller.portfolioCategory.value == 'Apps',
+            onTap: () => controller.setPortfolioCategory('Apps'),
           ),
           _TabButton(
             title: "Games",
-            isSelected: _selectedCategory == 'Games',
-            onTap: () => _setCategory('Games'),
+            isSelected: controller.portfolioCategory.value == 'Games',
+            onTap: () => controller.setPortfolioCategory('Games'),
           ),
         ],
       ),
-    ).animate().fadeIn(delay: 200.ms, duration: 600.ms);
+    ).animate().fadeIn(delay: 200.ms, duration: 600.ms));
   }
 }
 
@@ -387,9 +357,7 @@ class _TabButton extends StatelessWidget {
           child: Text(
             title,
             style: GoogleFonts.inter(
-              color: isSelected
-                  ? Colors.white
-                  : AppColors.textLightGrey,
+              color: isSelected ? Colors.white : AppColors.textLightGrey,
               fontWeight: FontWeight.w700,
               fontSize: 14,
             ),
@@ -645,10 +613,7 @@ class ProjectDetailsDialog extends StatelessWidget {
         builder: (context, value, child) {
           return Transform.scale(
             scale: 0.95 + (0.05 * value),
-            child: Opacity(
-              opacity: value,
-              child: child,
-            ),
+            child: Opacity(opacity: value, child: child),
           );
         },
         child: Container(
@@ -670,7 +635,9 @@ class ProjectDetailsDialog extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(32),
-            child: isDesktop ? _buildDesktopLayout(context) : _buildMobileLayout(context),
+            child: isDesktop
+                ? _buildDesktopLayout(context)
+                : _buildMobileLayout(context),
           ),
         ),
       ),
@@ -687,7 +654,9 @@ class ProjectDetailsDialog extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(48),
             decoration: BoxDecoration(
-              border: Border(right: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+              border: Border(
+                right: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -882,22 +851,31 @@ class ProjectDetailsDialog extends StatelessWidget {
         Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: data.tags.map((tag) => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(100),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-            ),
-            child: Text(
-              tag,
-              style: GoogleFonts.inter(
-                color: Colors.white.withValues(alpha: 0.7),
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          )).toList(),
+          children: data.tags
+              .map(
+                (tag) => Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: Text(
+                    tag,
+                    style: GoogleFonts.inter(
+                      color: Colors.white.withValues(alpha: 0.7),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
@@ -920,7 +898,8 @@ class ProjectDetailsDialog extends StatelessWidget {
         ),
         scrollDirection: Axis.horizontal,
         itemCount: data.images.length,
-        separatorBuilder: (context, index) => SizedBox(width: isDesktop ? 40 : 20),
+        separatorBuilder: (context, index) =>
+            SizedBox(width: isDesktop ? 40 : 20),
         itemBuilder: (context, index) {
           return HoverScaleWidget(
             child: Container(
@@ -958,6 +937,7 @@ class ProjectDetailsDialog extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildErrorPlaceholder() {
     return Container(
       color: const Color(0xFF1A1A1A),

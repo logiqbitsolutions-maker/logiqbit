@@ -1,7 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../data/models/project_model.dart';
+import '../../../data/project_data.dart';
+import '../../../data/models/booking_model.dart';
+import '../../../data/services/booking_service.dart';
 
 class HomeController extends GetxController {
+  // ─── Firestore ──────────────────────────────────────────────────────────────
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  // ─── Scroll & Navigation ────────────────────────────────────────────────────
   final ScrollController scrollController = ScrollController();
 
   final GlobalKey heroKey = GlobalKey();
@@ -14,8 +23,93 @@ class HomeController extends GetxController {
 
   final RxDouble scrollOpacity = 0.0.obs;
   final RxDouble scrollProgress = 1.0.obs;
-  final RxString activeSection = "Home".obs;
+  final RxString activeSection = 'Home'.obs;
 
+  // ─── Navbar ─────────────────────────────────────────────────────────────────
+  final RxDouble logoScale = 1.0.obs;
+
+  // ─── Portfolio ──────────────────────────────────────────────────────────────
+  final RxString portfolioCategory = 'Apps'.obs;
+  final ScrollController portfolioScrollController = ScrollController();
+
+  final List<ProjectModel> portfolioApps = ProjectData.apps;
+  final List<ProjectModel> portfolioGames = ProjectData.games;
+
+  RxList<ProjectModel> get currentPortfolioItems =>
+      (portfolioCategory.value == 'Apps' ? portfolioApps : portfolioGames).obs;
+
+  void setPortfolioCategory(String category) {
+    if (portfolioCategory.value == category) return;
+    portfolioCategory.value = category;
+    if (portfolioScrollController.hasClients) {
+      portfolioScrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutQuart,
+      );
+    }
+  }
+
+  // ─── Booking / Calendar ─────────────────────────────────────────────────────
+  final BookingService _bookingService = BookingService();
+
+  Future<void> addBooking(BookingModel booking) async {
+    try {
+      await _bookingService.saveBooking(booking);
+    } catch (e) {
+      debugPrint('Firestore booking save error: $e');
+    }
+  }
+
+  // ─── Contact / Booking Form ─────────────────────────────────────────────────
+  Future<void> saveInquiry(String name, String email, String helpTopic, String subject) async {
+    try {
+      await _db.collection('inquiries').add({
+        'name': name,
+        'email': email,
+        'helpTopic': helpTopic,
+        'subject': subject,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      debugPrint("Inquiry saved successfully.");
+      
+      await _bookingService.triggerInquiryEmail(
+        name: name,
+        email: email,
+        helpTopic: helpTopic,
+        subject: subject,
+      );
+    } catch (e) {
+      debugPrint("Error saving inquiry: $e");
+    }
+  }
+
+  // These are managed inside BookingDialog locally for form lifecycle,
+  // but the confirmation state (bookedDates) lives here.
+
+  // ─── Lifecycle ──────────────────────────────────────────────────────────────
+  @override
+  void onInit() {
+    super.onInit();
+
+    // Portfolio scroll indicator
+    portfolioScrollController.addListener(() => update(['portfolioScroll']));
+
+    // Page scroll listeners
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _calculateProgress();
+    });
+
+    scrollController.addListener(() {
+      _calculateProgress();
+      _updateActiveSectionOnScroll();
+      if (scrollController.hasClients) {
+        updateScrollOpacity(scrollController.position.pixels);
+      }
+    });
+  }
+
+  // ─── Scroll Helpers ─────────────────────────────────────────────────────────
   void updateScrollOpacity(double pixels) {
     scrollOpacity.value = (pixels / 100).clamp(0, 1);
   }
@@ -32,39 +126,21 @@ class HomeController extends GetxController {
     }
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-
-    // 2. Listener set karya pachi turant ek var calculate karo
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _calculateProgress();
-    });
-
-    scrollController.addListener(() {
-      _calculateProgress();
-      _updateActiveSectionOnScroll();
-      if (scrollController.hasClients) {
-        updateScrollOpacity(scrollController.position.pixels);
-      }
-    });
-  }
-
   void _updateActiveSectionOnScroll() {
     if (!scrollController.hasClients) return;
 
     final List<Map<String, dynamic>> sections = [
-      {"name": "Home", "key": heroKey},
-      {"name": "About Us", "key": aboutKey},
-      {"name": "Services", "key": servicesKey},
-      {"name": "Why Logiqbit", "key": whyUsKey},
-      {"name": "Why Logiqbit", "key": integrationsKey},
-      {"name": "Portfolio", "key": portfolioKey},
-      {"name": "Portfolio", "key": contactKey},
+      {'name': 'Home', 'key': heroKey},
+      {'name': 'About Us', 'key': aboutKey},
+      {'name': 'Services', 'key': servicesKey},
+      {'name': 'Why Logiqbit', 'key': whyUsKey},
+      {'name': 'Why Logiqbit', 'key': integrationsKey},
+      {'name': 'Portfolio', 'key': portfolioKey},
+      {'name': 'Portfolio', 'key': contactKey},
     ];
 
     String bestMatch = activeSection.value;
-    double minTopDistance = 300; // Threshold for a section to be considered "active" at the top
+    double minTopDistance = 300;
 
     for (var section in sections) {
       final key = section['key'] as GlobalKey;
@@ -73,9 +149,6 @@ class HomeController extends GetxController {
         final box = context.findRenderObject() as RenderBox?;
         if (box != null) {
           final position = box.localToGlobal(Offset.zero).dy;
-          
-          // If the top of the section is above the threshold, it becomes the potential active section
-          // As we iterate in order, the furthest section down that has passed the threshold will win
           if (position < minTopDistance) {
             bestMatch = section['name'];
           }
@@ -93,21 +166,21 @@ class HomeController extends GetxController {
       double maxScroll = scrollController.position.maxScrollExtent;
       double currentScroll = scrollController.position.pixels;
 
-      // Agar page scroll thai shake tem nathi (maxScroll == 0), to progress 1.0 rakho
       if (maxScroll <= 0) {
         scrollProgress.value = 1.0;
         return;
       }
 
-      // Logic: Top par 1.0, Bottom par 0.0
       double progress = 1.0 - (currentScroll / maxScroll);
       scrollProgress.value = progress.clamp(0.0, 1.0);
     }
   }
 
+  // ─── Cleanup ─────────────────────────────────────────────────────────────────
   @override
   void onClose() {
     scrollController.dispose();
+    portfolioScrollController.dispose();
     super.onClose();
   }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "927492670740",
+    "project_id": "logiqbit-solution-web",
+    "storage_bucket": "logiqbit-solution-web.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927492670740:android:6fd72d1458de9b4328ee01",
+        "android_client_info": {
+          "package_name": "com.example.logiqbit_solutions_web"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW6Yomkufkns0WcRqKFVT4aAFCTJ8dhUM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

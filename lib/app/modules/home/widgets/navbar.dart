@@ -7,8 +7,6 @@ import '../../../../core/values/app_colors.dart';
 import '../controllers/home_controller.dart';
 import 'animated_border_button.dart';
 
-final RxDouble _logoScale = 1.0.obs;
-
 class NavbarWidget extends StatelessWidget {
   const NavbarWidget({super.key});
 
@@ -34,14 +32,7 @@ class NavbarWidget extends StatelessWidget {
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: double.infinity),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.zero,
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: isScrolled ? 16 : 0,
-                      sigmaY: isScrolled ? 16 : 0,
-                    ),
-                    child: AnimatedContainer(
+                child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       padding: EdgeInsets.symmetric(
                         horizontal: isDesktop ? 60 : 24,
@@ -49,7 +40,7 @@ class NavbarWidget extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.backgroundBlack.withValues(
-                          alpha: isScrolled ? 0.65 : 0.0,
+                          alpha: isScrolled ? 0.95 : 0.0,
                         ),
                         borderRadius: BorderRadius.zero,
                         // border: removed as requested
@@ -70,8 +61,8 @@ class NavbarWidget extends StatelessWidget {
                             return MouseRegion(
                               cursor: SystemMouseCursors.click,
                               onEnter: (_) =>
-                                  _logoScale.value = 1.1, // Hover par 10% moto
-                              onExit: (_) => _logoScale.value =
+                                  controller.logoScale.value = 1.1, // Hover par 10% moto
+                              onExit: (_) => controller.logoScale.value =
                                   1.0, // Hover nikalta normal
                               child: GestureDetector(
                                 onTap: () => controller.scrollToSection(
@@ -82,7 +73,7 @@ class NavbarWidget extends StatelessWidget {
                                   duration: const Duration(milliseconds: 200),
                                   curve: Curves.easeInOut,
                                   transform: Matrix4.identity()
-                                    ..scale(_logoScale.value),
+                                    ..scale(controller.logoScale.value),
                                   child: const LogoWidget(),
                                 ),
                               ),
@@ -152,8 +143,6 @@ class NavbarWidget extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ),
-                ),
               ),
             ),
           );

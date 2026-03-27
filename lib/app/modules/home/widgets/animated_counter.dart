@@ -36,8 +36,10 @@ class _AnimatedCounterState extends State<AnimatedCounter>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
-    _animation = Tween<double>(begin: 0, end: widget.targetValue.toDouble())
-        .animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+    _animation = Tween<double>(
+      begin: 0,
+      end: widget.targetValue.toDouble(),
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
   }
 
   @override
@@ -56,7 +58,9 @@ class _AnimatedCounterState extends State<AnimatedCounter>
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
-      key: Key('animated_counter_${widget.targetValue}_${widget.prefix}${widget.suffix}'), 
+      key: Key(
+        'animated_counter_${widget.targetValue}_${widget.prefix}${widget.suffix}',
+      ),
       onVisibilityChanged: (info) {
         if (!mounted) return;
         if (info.visibleFraction > 0.1 && !_hasAnimated) {

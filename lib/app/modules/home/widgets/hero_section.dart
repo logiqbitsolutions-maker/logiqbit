@@ -21,41 +21,45 @@ class HeroSection extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment.center,
-                  radius: 1.5,
-                  colors: [
-                    AppColors.primaryOrange.withValues(alpha: 0.04),
-                    Colors.transparent,
-                  ],
-                  stops: const [0.0, 1.0],
+            child: RepaintBoundary(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment.center,
+                    radius: 1.5,
+                    colors: [
+                      AppColors.primaryOrange.withValues(alpha: 0.04),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 1.0],
+                  ),
                 ),
               ),
             ),
-          ).animate().fadeIn(duration: 1500.ms),
+          ).animate().fadeIn(duration: 1500.ms, delay: 400.ms),
 
           Positioned(
             right: -350,
             top: -250,
-            child: Container(
-              width: 1400, // સાઈઝ મોટી જેથી કટ ના થાય
-              height: 1400,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.primaryOrange.withValues(alpha: 0.16),
-                    AppColors.primaryOrange.withValues(alpha: 0.06),
-                    Colors.transparent, // સ્મૂથ એન્ડ
-                  ],
-                  // ગ્રેડિયન્ટ વચ્ચે જ પૂરો થઇ જશે જેથી લાઈન ન દેખાય
-                  stops: const [0.0, 0.4, 0.7],
+            child: RepaintBoundary(
+              child: Container(
+                width: 1400, // સાઈઝ મોટી જેથી કટ ના થાય
+                height: 1400,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.primaryOrange.withValues(alpha: 0.16),
+                      AppColors.primaryOrange.withValues(alpha: 0.06),
+                      Colors.transparent, // સ્મૂથ એન્ડ
+                    ],
+                    // ગ્રેડિયન્ટ વચ્ચે જ પૂરો થઇ જશે જેથી લાઈન ન દેખાય
+                    stops: const [0.0, 0.4, 0.7],
+                  ),
                 ),
               ),
             ),
-          ).animate().fadeIn(duration: 1200.ms),
+          ).animate().fadeIn(duration: 1200.ms, delay: 400.ms),
 
           MaxWidthContainer(
             child: Column(
@@ -138,7 +142,7 @@ class HeroSection extends StatelessWidget {
               const TextSpan(text: "Digital Solutions"),
             ],
           ),
-        ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0);
+        ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.1, end: 0);
       },
     );
   }
@@ -163,7 +167,7 @@ class HeroSection extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
           ),
-        ).animate().fadeIn(delay: 400.ms);
+        ).animate().fadeIn(delay: 800.ms);
       },
     );
   }
@@ -206,7 +210,7 @@ class HeroSection extends StatelessWidget {
           ),
         ),
       ],
-    ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0);
+    ).animate().fadeIn(delay: 1000.ms).slideY(begin: 0.2, end: 0);
   }
 
   Widget _buildGlowingCtaButton() {

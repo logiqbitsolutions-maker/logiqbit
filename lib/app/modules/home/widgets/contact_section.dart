@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/values/app_colors.dart';
+import '../controllers/home_controller.dart';
 import 'about_section.dart'; // For MaxWidthContainer
-import 'animated_border_button.dart';
+import 'booking_calendar.dart';
+import 'booking_dialog.dart';
 
 class ContactSection extends StatefulWidget {
   const ContactSection({super.key});
@@ -13,11 +16,13 @@ class ContactSection extends StatefulWidget {
 }
 
 class _ContactSectionState extends State<ContactSection> {
-  String _selectedHelp = "General Inquiry";
+  String _selectedHelp = "AI Solutions";
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _subjectController = TextEditingController();
   bool _isSending = false;
+  String? _nameError;
+  String? _emailError;
 
   @override
   void dispose() {
@@ -28,32 +33,114 @@ class _ContactSectionState extends State<ContactSection> {
   }
 
   Future<void> _submitForm() async {
-    if (_nameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
-        _subjectController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
+    setState(() {
+      _nameError = null;
+      _emailError = null;
+    });
+
+    bool hasError = false;
+    if (_nameController.text.trim().isEmpty) {
+      _nameError = "Name is required";
+      hasError = true;
+    }
+
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (_emailController.text.trim().isEmpty || !emailRegex.hasMatch(_emailController.text.trim())) {
+      _emailError = "Please enter a valid email address";
+      hasError = true;
+    }
+
+    if (hasError) {
+      setState(() {});
       return;
     }
 
     setState(() => _isSending = true);
 
-    // Mock sending for now since Vercel was removed
-    await Future.delayed(const Duration(seconds: 1));
+    final controller = Get.find<HomeController>();
+    await controller.saveInquiry(
+      _nameController.text.trim(),
+      _emailController.text.trim(),
+      _selectedHelp,
+      _subjectController.text.trim(),
+    );
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Message sent! We'll get back to you soon."),
-          backgroundColor: AppColors.primaryOrange,
-        ),
-      );
       _nameController.clear();
       _emailController.clear();
       _subjectController.clear();
       setState(() => _isSending = false);
+      
+      // Delaying the dialog by a frame prevents GoogleFonts and layout assertions
+      // occurring if this async callback resolves mid-frame.
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: AppColors.cardBlack,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          contentPadding: const EdgeInsets.all(32),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryOrange.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check_circle, color: AppColors.primaryOrange, size: 48),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                "Message Sent!",
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Thank you for reaching out. Our team will get back to you shortly.",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  color: AppColors.textLightGrey,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryOrange,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Done", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+      });
     }
+  }
+
+  void _showBookingDialog(DateTime date) {
+    final controller = Get.find<HomeController>();
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      builder: (context) => BookingDialog(
+        selectedDate: date,
+        onBookingConfirmed: controller.addBooking,
+      ),
+    );
   }
 
   @override
@@ -142,58 +229,7 @@ class _ContactSectionState extends State<ContactSection> {
 
   Widget _buildLeftCard() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 56),
-      decoration: BoxDecoration(
-        color: AppColors.primaryOrange,
-        borderRadius: BorderRadius.circular(28),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Elevate Your\nTech Presence",
-                style: GoogleFonts.inter(
-                  color: AppColors.textWhite,
-                  fontSize: 48,
-                  fontWeight: FontWeight.w900,
-                  height: 1.1,
-                  letterSpacing: -1.5,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                "Turn your ideas into reality with our expert team. Let's build something extraordinary together.",
-                style: GoogleFonts.inter(
-                  color: AppColors.textWhite.withValues(alpha: 0.8),
-                  fontSize: 16,
-                  height: 1.6,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 48),
-          // Book a Free Call button (white)
-          AnimatedBorderButton(
-            text: "Book a Free Call",
-            icon: Icons.arrow_outward,
-            onPressed: () {},
-            fillOnHover: false,
-            backgroundColor: Colors.transparent,
-            textColor: AppColors.textWhite,
-          ),
-        ],
-      ),
-    ).animate().fadeIn(duration: 800.ms).slideX(begin: -0.05, end: 0);
-  }
-
-  Widget _buildRightForm() {
-    final isMobile = MediaQuery.of(context).size.width < 800;
-    return Container(
-      padding: EdgeInsets.all(isMobile ? 24 : 48),
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 40),
       decoration: BoxDecoration(
         color: AppColors.cardBlack,
         borderRadius: BorderRadius.circular(28),
@@ -202,91 +238,115 @@ class _ContactSectionState extends State<ContactSection> {
           width: 1,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Row 1: Name + Email
-          if (!isMobile)
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    label: "YOUR NAME",
-                    hint: "John Doe",
-                    controller: _nameController,
-                  ),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: _buildTextField(
-                    label: "BUSINESS EMAIL",
-                    hint: "john@company.com",
-                    controller: _emailController,
-                  ),
-                ),
-              ],
-            )
-          else ...[
-            _buildTextField(
-              label: "YOUR NAME",
-              hint: "John Doe",
-              controller: _nameController,
+      child: BookingCalendar(
+        showBack: false,
+        onBack: () {},
+        onDateSelected: _showBookingDialog,
+      ),
+    );
+  }
+
+  Widget _buildRightForm() {
+    final isMobile = MediaQuery.of(context).size.width < 800;
+    return Container(
+          padding: EdgeInsets.all(isMobile ? 24 : 48),
+          decoration: BoxDecoration(
+            color: AppColors.cardBlack,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.06),
+              width: 1,
             ),
-            const SizedBox(height: 24),
-            _buildTextField(
-              label: "BUSINESS EMAIL",
-              hint: "john@company.com",
-              controller: _emailController,
-            ),
-          ],
-          const SizedBox(height: 24),
-          // Row 2: Help dropdown
-          _buildDropdown(),
-          const SizedBox(height: 24),
-          // Row 3: Subject
-          _buildTextField(
-            label: "SUBJECT",
-            hint: "Tell us about your project...",
-            maxLines: 4,
-            controller: _subjectController,
           ),
-          const SizedBox(height: 36),
-          // Submit button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _isSending ? null : _submitForm,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOrange,
-                foregroundColor: AppColors.textWhite,
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: _isSending
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : Text(
-                      "Send Message",
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Row 1: Name + Email
+              if (!isMobile)
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        label: "YOUR NAME",
+                        hint: "John Doe",
+                        controller: _nameController,
+                        errorText: _nameError,
                       ),
                     ),
-            ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: _buildTextField(
+                        label: "BUSINESS EMAIL",
+                        hint: "john@company.com",
+                        controller: _emailController,
+                        errorText: _emailError,
+                      ),
+                    ),
+                  ],
+                )
+              else ...[
+                _buildTextField(
+                  label: "YOUR NAME",
+                  hint: "John Doe",
+                  controller: _nameController,
+                  errorText: _nameError,
+                ),
+                const SizedBox(height: 24),
+                _buildTextField(
+                  label: "BUSINESS EMAIL",
+                  hint: "john@company.com",
+                  controller: _emailController,
+                  errorText: _emailError,
+                ),
+              ],
+              const SizedBox(height: 24),
+              // Row 2: Help dropdown
+              _buildDropdown(),
+              const SizedBox(height: 24),
+              // Row 3: Subject
+              _buildTextField(
+                label: "SUBJECT",
+                hint: "Tell us about your project...",
+                maxLines: 4,
+                controller: _subjectController,
+              ),
+              const SizedBox(height: 36),
+              // Submit button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isSending ? null : _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryOrange,
+                    foregroundColor: AppColors.textWhite,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: _isSending
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          "Send Message",
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    )
+        )
         .animate()
         .fadeIn(delay: 200.ms, duration: 800.ms)
         .slideX(begin: 0.05, end: 0);
@@ -297,6 +357,7 @@ class _ContactSectionState extends State<ContactSection> {
     required String hint,
     required TextEditingController controller,
     int maxLines = 1,
+    String? errorText,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,6 +378,8 @@ class _ContactSectionState extends State<ContactSection> {
           style: GoogleFonts.inter(color: AppColors.textWhite, fontSize: 15),
           decoration: InputDecoration(
             hintText: hint,
+            errorText: errorText,
+            errorStyle: GoogleFonts.inter(color: Colors.redAccent, fontSize: 12),
             hintStyle: GoogleFonts.inter(
               color: AppColors.textDarkGrey,
               fontSize: 15,
@@ -402,11 +465,11 @@ class _ContactSectionState extends State<ContactSection> {
           ),
           items:
               [
+                    "AI Solutions",
+                    "Web Development",
+                    "Mobile App",
+                    "Game Development",
                     "General Inquiry",
-                    "Custom Software Development",
-                    "Digital Strategy",
-                    "Cloud Architecture",
-                    "Partnership",
                   ]
                   .map(
                     (e) => DropdownMenuItem(
